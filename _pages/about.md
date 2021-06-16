@@ -1,13 +1,14 @@
 ---
+layout: archive
+title: 
 permalink: /
-title:
-excerpt: "About me"
 author_profile: true
 redirect_from: 
   - /about/
   - /about.html
 ---
 
+{% include base_path %}
 
 I am a PhD student in the [Biomedical Image Computing group](https://bmic.ee.ethz.ch/research.html) at the [Computer Vision Institute](http://www.vision.ee.ethz.ch/en/) at [ETH Zurich](https://www.ethz.ch/en.html). My supervisor is [Prof. Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/).
 
