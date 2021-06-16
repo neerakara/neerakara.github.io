@@ -13,23 +13,23 @@ redirect_from:
 ### Education
 ---
 
-* [Bachelor of Technology, Engineering Design](https://ed.iitm.ac.in/)
+* Bachelor of Technology, [Engineering Design](https://ed.iitm.ac.in/)
    * [Indian Institute of Technology Madras, Chennai, India](https://www.iitm.ac.in/) (IIT Madras)
    * 2008 - 2011
 
-* [Master of Technology, Biomedical Design](https://ed.iitm.ac.in/program.html)
+* Master of Technology, [Biomedical Design](https://ed.iitm.ac.in/program.html)
    * [Indian Institute of Technology Madras, Chennai, India](https://www.iitm.ac.in/) (IIT Madras)
    * 2011 - 2013
    * Thesis: Multimodal image registration
    * Advisor: [Prof. R Krishna Kumar](https://prof-rkkumar.wixsite.com/personal-page)
 
-* [Master of Science, Biomedical Imaging](https://master-biomed.ethz.ch/)
+* Master of Science, [Biomedical Imaging](https://master-biomed.ethz.ch/)
    * [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) (ETH Zurich)
    * 2015 - 2017
    * Thesis: Image interpolation for 4D MRI reconstruction
    * Advisors: [Dr. Christine Tanner](https://www.bmc.unibas.ch/institute/assistance_tanner.phtml), [Prof. Ender Konukoglu](https://people.ee.ethz.ch/~kender/), [Prof. Sebastian Kozerke](https://ee.ethz.ch/the-department/people-a-z/person-detail.NjE2NDE=.TGlzdC8zMjc5LC0xNjUwNTg5ODIw.html)
 
-* [Ph.D, Medical Image Analysis](https://bmic.ee.ethz.ch/)
+* Ph.D, [Medical Image Analysis](https://bmic.ee.ethz.ch/)
    * [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) (ETH Zurich)
    * 2017 - 2021 (expected)
    * Thesis: Tackling domain shifts in medical image analysis
