@@ -7,7 +7,7 @@
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Your Name / Site Title"
+title                    : "Neerav Karani"
 title_separator          : "-"
 name                     : &name "Neerav Karani"
 description              : &description "PhD Student, ETH Zurich"
@@ -80,7 +80,7 @@ analytics:
 
 # Site Author
 author:
-  name             : "Neerav Karani"
+  name             : 
   avatar           : "profile.png"
   bio              : "PhD Student, ETH Zurich"
   location         : 
