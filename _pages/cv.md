@@ -22,25 +22,32 @@ redirect_from:
    * [Biomedical Design](https://ed.iitm.ac.in/program.html)
    * [Indian Institute of Technology Madras, Chennai, India](https://www.iitm.ac.in/) (IIT Madras)
    * 2011 - 2013
+   * Thesis: Multimodal image registration for image-guided surgery
 
 * Master of Science
    * [Biomedical Imaging](https://master-biomed.ethz.ch/)
    * [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) (ETH Zurich)
    * 2015 - 2017
+   * Thesis: Image interpolation for 4D MRI reconstruction
 
 * Ph.D
    * [Medical Image Analysis](https://bmic.ee.ethz.ch/)
    * [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) (ETH Zurich)
    * 2017 - 2021 (expected)
+   * Thesis: Tackling domain shifts in medical image analysis
 
 
 ### Work experience
 ---
 
-* [Philips Healthcare, R & D](https://www.philips.co.in/a-w/about-philips/healthcare-innovation-campus.html)
+* [Philips Healthcare](https://www.philips.co.in/a-w/about-philips/healthcare-innovation-campus.html) 
   * Embedded software development
   * 2013 - 2015
-  
+
+* [Trivitron Healthcare](https://www.trivitron.com/)
+  * 
+  * Internship
+  * 2012 (6 months)  
 
 ### Teaching
 ---
