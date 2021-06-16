@@ -70,3 +70,15 @@ redirect_from:
 * [ED304, Product Design Laboratory, IIT Madras](https://ed.iitm.ac.in/img/files/Prodect%20Design.pdf)
   * Autumn semester 2012
   
+### Publications
+---
+
+* Conferences: [MICCAI](http://www.miccai.org/), [MIDL](https://www.midl.io/), [IPMI](https://link.springer.com/conference/ipmi), [NeurIPS](https://nips.cc/)
+* Journals: [IEEE Transactions on Medical Imaging](https://ieeexplore.ieee.org/xpl/aboutJournal.jsp?punumber=42), [Elsevier Medical Image Analysis](https://www.journals.elsevier.com/medical-image-analysis), [International Journal of Computer Assisted Radiology and Surgery (IJCARS)](https://www.springer.com/journal/11548)
+* [Full list](https://scholar.google.ch/citations?user=neLQ1MQAAAAJ&hl=en)
+
+### Reviewed for
+---
+
+* Conferences: [MICCAI](http://www.miccai.org/), [MIDL](https://www.midl.io/), [NeurIPS](https://nips.cc/), [ICLR](https://iclr.cc/)
+* Journals: [IEEE Transactions on Medical Imaging](https://ieeexplore.ieee.org/xpl/aboutJournal.jsp?punumber=42)
