@@ -43,12 +43,12 @@ redirect_from:
 ### Work experience
 ---
 
-* [Philips Healthcare](https://www.philips.co.in/a-w/about-philips/healthcare-innovation-campus.html) 
+* Senior Electrical Engineer, [Philips Healthcare](https://www.philips.co.in/a-w/about-philips/healthcare-innovation-campus.html) 
   * Embedded software development
   * 2013 - 2015
 
-* [Trivitron Healthcare](https://www.trivitron.com/)
-  * Internship
+* Intern, [Trivitron Healthcare](https://www.trivitron.com/)
+  * Proof-of-concept development of an image-guided surgery system
   * 2012 (6 months)  
 
 ### Teaching
