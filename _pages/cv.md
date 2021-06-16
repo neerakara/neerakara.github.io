@@ -39,8 +39,8 @@ redirect_from:
 
 * [Philips Healthcare, R & D](https://www.philips.co.in/a-w/about-philips/healthcare-innovation-campus.html)
   * Senior Electrical Engineer
-  * 2013 - 2015
   * Embedded software development
+  * 2013 - 2015
   
 
 ### Teaching
@@ -51,7 +51,7 @@ redirect_from:
   * Co-taught with [Prof. Ender Konukoglu](https://people.ee.ethz.ch/~kender/), [Prof. Mauricio Reyes](http://www.mauricioreyes.me/aboutme.html)
   * [Recordings](https://youtube.com/playlist?list=PLED7YdXrsctWQ3hLWNZwiXpgbhrtDQ3d6)
 
-### Teaching Assistant
+### Teaching Assistantships
 ---
 
 * [227-0396-00L, EXCITE Interdisciplinary Summer School on Biomedical Imaging, ETH Zurich](http://www.vvz.ethz.ch/Vorlesungsverzeichnis/lerneinheit.view?lerneinheitId=149086&semkez=2021S&ansicht=KATALOGDATEN&lang=en)
