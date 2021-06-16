@@ -1,6 +1,6 @@
 ---
 layout: archive
-title: "CV"
+title: 
 permalink: /cv/
 author_profile: true
 redirect_from:
@@ -9,16 +9,14 @@ redirect_from:
 
 {% include base_path %}
 
-Education
-======
+### Education
 * B.Tech. | [Engineering Design](https://ed.iitm.ac.in/) | [Indian Institute of Technology Madras, Chennai, India](https://www.iitm.ac.in/) | (2008 - 2012)
-* M.Tech., [Biomedical Design](https://ed.iitm.ac.in/program.html), [Indian Institute of Technology Madras, Chennai, India](https://www.iitm.ac.in/) (2012 - 2013)
-* M.Sc., [Biomedical Imaging](https://master-biomed.ethz.ch/), [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) (2015 - 2017)
-* Ph.D, [Medical Image Analysis](https://bmic.ee.ethz.ch/), [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) (2017 - 2021 (expected))
+* M.Tech. | [Biomedical Design](https://ed.iitm.ac.in/program.html) | [Indian Institute of Technology Madras, Chennai, India](https://www.iitm.ac.in/) | (2012 - 2013)
+* M.Sc. | [Biomedical Imaging](https://master-biomed.ethz.ch/) | [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) | (2015 - 2017)
+* Ph.D | [Medical Image Analysis](https://bmic.ee.ethz.ch/) | [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) | (2017 - 2021 (expected))
 
-Work experience
-======
-* Senior Electrical Engineer, [Philips Healthcare, R & D](https://www.philips.co.in/a-w/about-philips/healthcare-innovation-campus.html) (2013 - 2015) 
+### Work experience
+* Senior Electrical Engineer | [Philips Healthcare, R & D](https://www.philips.co.in/a-w/about-philips/healthcare-innovation-campus.html) | (2013 - 2015) 
   *  Embedded software development
   
 Publications
