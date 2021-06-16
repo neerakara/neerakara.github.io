@@ -97,8 +97,9 @@ redirect_from:
 ---
 
 * [Prof. Ender Konukoglu](https://people.ee.ethz.ch/~kender/)
-* [Prof. Christian Baumgartner](https://baumgach.github.io/)
+* [Dr. Christian Baumgartner](https://baumgach.github.io/)
 * [Dr. Christine Tanner](https://www.bmc.unibas.ch/institute/assistance_tanner.phtml)
+* [Prof. Sebastian Kozerke](https://ee.ethz.ch/the-department/people-a-z/person-detail.NjE2NDE=.TGlzdC8zMjc5LC0xNjUwNTg5ODIw.html)
 * [Prof. Orcun Goksel](https://people.ee.ethz.ch/~ogoksel/)
 * [Prof. R Krishna Kumar](https://prof-rkkumar.wixsite.com/personal-page)
 * [Shankar Subramanian](https://www.linkedin.com/in/sankarasubramanian/)
