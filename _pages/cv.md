@@ -9,6 +9,7 @@ redirect_from:
 
 {% include base_path %}
 
+---
 ### Education
 ---
 
@@ -32,6 +33,7 @@ redirect_from:
    * [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html)
    * 2017 - 2021 (expected)
 
+---
 ### Work experience
 ---
 
@@ -40,6 +42,7 @@ redirect_from:
   * 2013 - 2015
   * Embedded software development
   
+---
 ### Teaching
 ---
 
