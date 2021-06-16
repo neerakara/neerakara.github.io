@@ -38,7 +38,6 @@ redirect_from:
 ---
 
 * [Philips Healthcare, R & D](https://www.philips.co.in/a-w/about-philips/healthcare-innovation-campus.html)
-  * Senior Electrical Engineer
   * Embedded software development
   * 2013 - 2015
   
