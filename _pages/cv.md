@@ -22,19 +22,22 @@ redirect_from:
    * [Biomedical Design](https://ed.iitm.ac.in/program.html)
    * [Indian Institute of Technology Madras, Chennai, India](https://www.iitm.ac.in/) (IIT Madras)
    * 2011 - 2013
-   * Thesis: Multimodal image registration for image-guided surgery
+   * Thesis: Multimodal image registration
+   * Advisor: [Prof. R Krishna Kumar](https://prof-rkkumar.wixsite.com/personal-page)
 
 * Master of Science
    * [Biomedical Imaging](https://master-biomed.ethz.ch/)
    * [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) (ETH Zurich)
    * 2015 - 2017
    * Thesis: Image interpolation for 4D MRI reconstruction
+   * Advisors: [Dr. Christine Tanner](https://www.bmc.unibas.ch/institute/assistance_tanner.phtml), [Prof. Ender Konukoglu](https://people.ee.ethz.ch/~kender/), [Prof. Sebastian Kozerke](https://ee.ethz.ch/the-department/people-a-z/person-detail.NjE2NDE=.TGlzdC8zMjc5LC0xNjUwNTg5ODIw.html)
 
 * Ph.D
    * [Medical Image Analysis](https://bmic.ee.ethz.ch/)
    * [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) (ETH Zurich)
    * 2017 - 2021 (expected)
    * Thesis: Tackling domain shifts in medical image analysis
+   * Advisor: [Prof. Ender Konukoglu](https://people.ee.ethz.ch/~kender/)
 
 
 ### Work experience
@@ -45,7 +48,6 @@ redirect_from:
   * 2013 - 2015
 
 * [Trivitron Healthcare](https://www.trivitron.com/)
-  * 
   * Internship
   * 2012 (6 months)  
 
@@ -89,3 +91,14 @@ redirect_from:
 
 * Conferences: [MICCAI](http://www.miccai.org/), [MIDL](https://www.midl.io/), [NeurIPS](https://nips.cc/), [ICLR](https://iclr.cc/)
 * Journals: [IEEE Transactions on Medical Imaging](https://ieeexplore.ieee.org/xpl/aboutJournal.jsp?punumber=42)
+
+
+### References
+---
+
+* [Prof. Ender Konukoglu](https://people.ee.ethz.ch/~kender/)
+* [Prof. Christian Baumgartner](https://baumgach.github.io/)
+* [Dr. Christine Tanner](https://www.bmc.unibas.ch/institute/assistance_tanner.phtml)
+* [Prof. Orcun Goksel](https://people.ee.ethz.ch/~ogoksel/)
+* [Prof. R Krishna Kumar](https://prof-rkkumar.wixsite.com/personal-page)
+* [Shankar Subramanian](https://www.linkedin.com/in/sankarasubramanian/)
