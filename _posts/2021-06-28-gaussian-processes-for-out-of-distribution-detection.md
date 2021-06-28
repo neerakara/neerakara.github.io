@@ -23,19 +23,19 @@ tags:
  If the covariance function depends only on the distance between $x_i$ and $x_j$, and not on their absolute values, the gaussian process is said to be $\textit{stationary}$.
 
  GPs can be used in several ways:
-      * As priors over functions, with the covariance function that defines the GP representing the smoothness of the prior -->
-      $f(x_i)$ and $f(x_j)$ are correlated according to the distance between $x_i$ and $x_j$, and the smoothness defined by the covariance function $k(x_i, x_j)$.
-      * Updating the prior in the light of training data - in other words, computing the posterior GP.
-      Consider a scenario where we know the value of a function at a number of training input points $x_i, i=1, .. n$,
-      and are interested in knowing the distribution over the function values at a number of test input points $x_j^{test}, j=1, .. m$.
-      According to the GP, the joint distribution of the vector ($\in \mathcal{R}^{m+n}$) of function values of all training as well as test points
-      is a multivariate gaussian distribution (defined by a mean vector and a covariance matrix).
-      The conditional distribution of the function values at the test points given the function values at the training points is also
-      a gaussian distribution whose parameters can be computed analytically in terms of the training data and the covariance function.
-      A computational concern is that the mean vector and the covariance matrix of the posterior GP depend on the inverse of the covariance matrix of the training datapoints.
-      This inversion is $O(n^3)$.
-      * Training the GP prior: This refers to specifying a GP's mean and covariance function upto some parameters
-      and then finding maximum likelihood estimates for these parameters using available data.
+  * As priors over functions, with the covariance function that defines the GP representing the smoothness of the prior -->
+  $f(x_i)$ and $f(x_j)$ are correlated according to the distance between $x_i$ and $x_j$, and the smoothness defined by the covariance function $k(x_i, x_j)$.
+  * Updating the prior in the light of training data - in other words, computing the posterior GP.
+  Consider a scenario where we know the value of a function at a number of training input points $x_i, i=1, .. n$,
+  and are interested in knowing the distribution over the function values at a number of test input points $x_j^{test}, j=1, .. m$.
+  According to the GP, the joint distribution of the vector ($\in \mathcal{R}^{m+n}$) of function values of all training as well as test points
+  is a multivariate gaussian distribution (defined by a mean vector and a covariance matrix).
+  The conditional distribution of the function values at the test points given the function values at the training points is also
+  a gaussian distribution whose parameters can be computed analytically in terms of the training data and the covariance function.
+  A computational concern is that the mean vector and the covariance matrix of the posterior GP depend on the inverse of the covariance matrix of the training datapoints.
+  This inversion is $O(n^3)$.
+  * Training the GP prior: This refers to specifying a GP's mean and covariance function upto some parameters
+  and then finding maximum likelihood estimates for these parameters using available data.
 
 * Sparse GPs
 ([Snelson, Ghahramani | UCL | NeurIPS 2005](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.60.2209&rep=rep1&type=pdf),
