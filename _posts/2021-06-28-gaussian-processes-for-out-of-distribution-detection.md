@@ -37,18 +37,18 @@ tags:
       * Training the GP prior: This refers to specifying a GP's mean and covariance function upto some parameters
       and then finding maximum likelihood estimates for these parameters using available data.
 
-    * Sparse GPs
-    ([Snelson, Ghahramani | UCL | NeurIPS 2005](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.60.2209&rep=rep1&type=pdf),
-    [Hensman, Fusi, Lawrence | Sheffield 2013](https://arxiv.org/ftp/arxiv/papers/1309/1309.6835.pdf))
-    introduce $m$ ($<< n$) new input points (called psuedo-inputs or $\textit{inducing points}$),
-    such that the distribution of the function values at test points conditioned on the new data points is close to the one conditioned on the original $n$ data points,
-    with the computational benefit that one has to now invert only a $m$x$m$ covariance matrix instead of a $n$x$n$ one.
+* Sparse GPs
+([Snelson, Ghahramani | UCL | NeurIPS 2005](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.60.2209&rep=rep1&type=pdf),
+[Hensman, Fusi, Lawrence | Sheffield 2013](https://arxiv.org/ftp/arxiv/papers/1309/1309.6835.pdf))
+introduce $m$ ($<< n$) new input points (called psuedo-inputs or $\textit{inducing points}$),
+such that the distribution of the function values at test points conditioned on the new data points is close to the one conditioned on the original $n$ data points,
+with the computational benefit that one has to now invert only a $m$x$m$ covariance matrix instead of a $n$x$n$ one.
     
 
-    * Deep GPs ([Damianou, Lawrence | Sheffield | AISTATS 2013](http://proceedings.mlr.press/v31/damianou13a.pdf))
+* Deep GPs ([Damianou, Lawrence | Sheffield | AISTATS 2013](http://proceedings.mlr.press/v31/damianou13a.pdf))
 
-    * Convolutional GPs ([Wilk, Rasmussen, Hensman | Cambridge | NeurIPS 2017](https://arxiv.org/pdf/1709.01894.pdf))
+* Convolutional GPs ([Wilk, Rasmussen, Hensman | Cambridge | NeurIPS 2017](https://arxiv.org/pdf/1709.01894.pdf))
 
-    * Deep convolutional GPs ([Blomqvist, Kaski, Heinonen | Helsinki 2019](https://arxiv.org/pdf/1810.03052.pdf))
+* Deep convolutional GPs ([Blomqvist, Kaski, Heinonen | Helsinki 2019](https://arxiv.org/pdf/1810.03052.pdf))
 
-    * Distributional GPs ([Popescu, Sharp, Cole, Glocker | Imperial College London | 2020](https://arxiv.org/pdf/2010.14877.pdf))
+* Distributional GPs ([Popescu, Sharp, Cole, Glocker | Imperial College London | 2020](https://arxiv.org/pdf/2010.14877.pdf))
