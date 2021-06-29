@@ -1,13 +1,15 @@
 ---
 title: 'Gaussian Processes for Out-Of-Distribution Detection'
-date: 2021-06-28
+date: 2021-06-30
 permalink: /notes/gps-ood/
 tags:
   - gaussian processes
   - out-of-distribution detection
 ---
 
-### Gaussian processes (GPs) ([Rasmussen 2003](https://link.springer.com/content/pdf/10.1007%2F978-3-540-28650-9_4.pdf), [Rasmussen, Williams 2006](http://www.gaussianprocess.org/gpml/chapters/RW.pdf), [Görtler, Kehlbeck, Deussen | Konstanz | Distill 2019](https://distill.pub/2019/visual-exploration-gaussian-processes/)):
+### Gaussian processes (GPs)
+([Rasmussen 2003](https://link.springer.com/content/pdf/10.1007%2F978-3-540-28650-9_4.pdf), [Rasmussen, Williams 2006](http://www.gaussianprocess.org/gpml/chapters/RW.pdf), [Görtler, Kehlbeck, Deussen | Konstanz | Distill 2019](https://distill.pub/2019/visual-exploration-gaussian-processes/))
+
  A random process / stochastic process is a sequence of random variables $X_1, X_2, ..., X_T$.
  A random field / stochastic field is when the random variables of interest occur in 2 or more dimensions (eg $X_{ij}, i=1, 2..N, j=1,2,..M$).
  We define a particular family of random processes / fields (e.g. Bernoulli process, Markov process, Markov random fields, Gaussian processes, etc.)
@@ -34,18 +36,25 @@ tags:
   * Training the GP prior: This refers to specifying a GP's mean and covariance function upto some parameters
   and then finding maximum likelihood estimates for these parameters using available data.
 
-### Sparse GPs ([Snelson, Ghahramani | UCL | NeurIPS 2005](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.60.2209&rep=rep1&type=pdf), [Hensman, Fusi, Lawrence | Sheffield 2013](https://arxiv.org/ftp/arxiv/papers/1309/1309.6835.pdf))
-introduce $m$ ($<< n$) new input points (called psuedo-inputs or $\textit{inducing points}$),
+### Sparse GPs
+([Snelson, Ghahramani | UCL | NeurIPS 2005](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.60.2209&rep=rep1&type=pdf), [Hensman, Fusi, Lawrence | Sheffield 2013](https://arxiv.org/ftp/arxiv/papers/1309/1309.6835.pdf))
+
+SGPs introduce $m$ ($<< n$) new input points (called psuedo-inputs or $\textit{inducing points}$),
 such that the distribution of the function values at test points conditioned on the new data points is close to the one conditioned on the original $n$ data points,
 with the computational benefit that one has to now invert only a $m$x$m$ covariance matrix instead of a $n$x$n$ one.
     
 
-### Deep GPs ([Damianou, Lawrence | Sheffield | AISTATS 2013](http://proceedings.mlr.press/v31/damianou13a.pdf))
+### Deep GPs
+([Damianou, Lawrence | Sheffield | AISTATS 2013](http://proceedings.mlr.press/v31/damianou13a.pdf))
 
-### Convolutional GPs ([Wilk, Rasmussen, Hensman | Cambridge | NeurIPS 2017](https://arxiv.org/pdf/1709.01894.pdf))
+### Convolutional GPs
+[Wilk, Rasmussen, Hensman | Cambridge | NeurIPS 2017](https://arxiv.org/pdf/1709.01894.pdf))
 
-### Deep convolutional GPs ([Blomqvist, Kaski, Heinonen | Helsinki 2019](https://arxiv.org/pdf/1810.03052.pdf))
+### Deep convolutional GP
+([Blomqvist, Kaski, Heinonen | Helsinki 2019](https://arxiv.org/pdf/1810.03052.pdf))
 
-### Distributional GPs ([Popescu, Sharp, Cole, Glocker | Imperial College London | 2020](https://arxiv.org/pdf/2010.14877.pdf))
+### Distributional GPs
+[Popescu, Sharp, Cole, Glocker | Imperial College London | 2020](https://arxiv.org/pdf/2010.14877.pdf))
 
-### Distributional Gaussian Process Layers for Outlier Detection in Image Segmentation ([Popescu, Sharp, Cole, Kamnitsas, Glocker | Imperial College London](https://link.springer.com/content/pdf/10.1007%2F978-3-030-78191-0_32.pdf))
+### Distributional Gaussian Process Layers for Outlier Detection in Image Segmentation
+([Popescu, Sharp, Cole, Kamnitsas, Glocker | Imperial College London | IPMI 2021](https://link.springer.com/content/pdf/10.1007%2F978-3-030-78191-0_32.pdf))
