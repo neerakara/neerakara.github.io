@@ -22,6 +22,7 @@ In our research, we attempt to tackle this issue within two paradigms - those of
 
 ### Short Bio
 ---
+| Degree / Position | University / Company  | Duration |
 | :---------: | :---------: | ------------------- |
 | Doctor of Science (PhD), Medical Image Analysis  | [ETH Zurich](https://www.ethz.ch/en.html) | 2017 - 2022 |
 | | | |
