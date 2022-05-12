@@ -22,6 +22,7 @@ In our research, we attempt to tackle this issue within two paradigms - those of
 
 ### Short Bio
 ---
+| :---------: | :---------: | ------------------- |
 | Doctor of Science (PhD), Medical Image Analysis  | [ETH Zurich](https://www.ethz.ch/en.html) | 2017 - 2022 |
 | | | |
 | Master of Science, Biomedical Imaging  | [ETH Zurich](https://www.ethz.ch/en.html) | 2015 - 2017 |
