@@ -12,7 +12,7 @@ redirect_from:
 
 ### About me
 ---
-I completed my PhD in the [Biomedical Image Computing group](https://bmic.ee.ethz.ch/research.html) at the [Computer Vision Institute](http://www.vision.ee.ethz.ch/en/) at [ETH Zurich](https://www.ethz.ch/en.html). I was advised by [Prof. Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/). From July 2022, I will be a postdoctoral fellow in [Prof. Polina Golland](https://people.csail.mit.edu/polina/)'s group at [CSAIL](https://www.csail.mit.edu/), [MIT](https://web.mit.edu/). I am funded by the [Swiss National Science Foundation](https://www.snf.ch/en)'s [mobility fellowship](https://www.snf.ch/en/XIZpfY3iVS5KRRoD/funding/careers/postdoc-mobility).
+I completed my PhD in the [Biomedical Image Computing group](https://bmic.ee.ethz.ch/research.html) at the [Computer Vision Institute](http://www.vision.ee.ethz.ch/en/) at [ETH Zurich](https://www.ethz.ch/en.html). I was advised by [Prof. Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/). From July 2022, I will be a postdoctoral fellow in [Prof. Polina Golland](https://people.csail.mit.edu/polina/)'s group at [MIT](https://web.mit.edu/). I am funded by the [Swiss National Science Foundation](https://www.snf.ch/en)'s [mobility fellowship](https://www.snf.ch/en/XIZpfY3iVS5KRRoD/funding/careers/postdoc-mobility).
 
 ### Research
 ---
@@ -24,7 +24,7 @@ We consider a wide spectrum of distribution shifts, including those caused by ch
 
 ### Short CV
 ---
-* Postdoctoral Fellow, Medical Image Analysis, [CSAIL, MIT](https://www.csail.mit.edu/), July 2022 - June 2024
+* Postdoctoral Fellow, Medical Image Analysis, [MIT](https://web.mit.edu/), July 2022 - June 2024
 * Postdoctoral Fellow, Medical Image Analysis, [ETH Zurich](https://www.ethz.ch/en.html), March 2022 - June 2022
 * Doctor of Science (PhD), Medical Image Analysis, [ETH Zurich](https://www.ethz.ch/en.html), July 2017 - February 2022
 * Master of Science, Biomedical Imaging, [ETH Zurich](https://www.ethz.ch/en.html), September 2015 - April 2017
