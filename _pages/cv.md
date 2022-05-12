@@ -16,7 +16,7 @@ redirect_from:
 * Ph.D
    * [Medical Image Analysis](https://bmic.ee.ethz.ch/) 
    * [Swiss Federal Institute of Technology, Zurich, Switzerland](https://ethz.ch/en.html) (ETH Zurich)
-   * 2017 - 2021 (expected)
+   * 2017 - 2022
    * Thesis: Tackling domain shifts in medical image analysis
    * Advisor: [Prof. Ender Konukoglu](https://people.ee.ethz.ch/~kender/)
    
@@ -44,7 +44,7 @@ redirect_from:
 ---
 
 * [227-0391-00L, Medical Image Analysis, ETH Zurich](http://www.vvz.ethz.ch/Vorlesungsverzeichnis/lerneinheit.view?lerneinheitId=148945&semkez=2021S&ansicht=KATALOGDATEN&lang=en)
-  * Spring semesters 2020, 2021
+  * Spring semesters 2020, 2021, 2022
   * Co-taught with [Prof. Ender Konukoglu](https://people.ee.ethz.ch/~kender/), [Prof. Mauricio Reyes](http://www.mauricioreyes.me/aboutme.html)
   * [Recordings](https://youtube.com/playlist?list=PLED7YdXrsctWQ3hLWNZwiXpgbhrtDQ3d6)
 
