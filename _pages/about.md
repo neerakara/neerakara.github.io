@@ -20,7 +20,7 @@ I study distribution shifts in machine learning methods for medical image analys
 
 In our research, we focus on machine learning settings of domain generalization and continual learning, which are especially suitable for medical image analyses to deal with challenges such as small-sized annotated datasets, data privacy concerns and the ubiquitous distributions shifts due to rapidly changing imaging protocols.
 
-We consider a wide spectrum of distribution shifts, including those caused by changes in acquisition protocols as well as population demographics. Progress in this research direction can greatly enhance the trustworthiness and reliability of ML methods, thereby facilitating their translation into clinical practice, and ultimately improving the efficiency and reach of healthcare systems.
+We consider a wide spectrum of distribution shifts, including those caused by changes in acquisition protocols as well as population demographics. Progress in this research direction can greatly enhance the trustworthiness and reliability of machine learning methods, thereby facilitating their translation into clinical practice, and ultimately improving the efficiency and reach of healthcare systems.
 
 ### Short CV
 ---
