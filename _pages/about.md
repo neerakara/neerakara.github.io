@@ -24,9 +24,10 @@ We consider a wide spectrum of distribution shifts, including those caused by ch
 
 ### Short CV
 ---
-* Postdoctoral Fellow, Medical Image Analysis, [CSAIL, MIT](https://www.csail.mit.edu/), 2022 - 2024
-* Doctor of Science (PhD), Medical Image Analysis, [ETH Zurich](https://www.ethz.ch/en.html), 2017 - 2022
-* Master of Science, Biomedical Imaging, [ETH Zurich](https://www.ethz.ch/en.html), 2015 - 2017
-* Senior Electrical Engineer, [Philips Healthcare Innovation Center](https://www.philips.com/a-w/asiapac/careers/healthtech/locations/india/healthcare-innovation-centre.html), 2013 - 2015
-* Master of Technology, Biomedical Design, [Indian Institute of Technology Madras](https://www.iitm.ac.in/), 2012 - 2013
-* Bachelor of Technology, Engineering Design, [Indian Institute of Technology Madras](https://www.iitm.ac.in/), 2008 - 2012
+* Postdoctoral Fellow, Medical Image Analysis, [CSAIL, MIT](https://www.csail.mit.edu/), July 2022 - June 2024
+* Postdoctoral Fellow, Medical Image Analysis, [ETH Zurich](https://www.ethz.ch/en.html), March 2022 - June 2022
+* Doctor of Science (PhD), Medical Image Analysis, [ETH Zurich](https://www.ethz.ch/en.html), July 2017 - February 2022
+* Master of Science, Biomedical Imaging, [ETH Zurich](https://www.ethz.ch/en.html), September 2015 - April 2017
+* Senior Electrical Engineer, [Philips Healthcare Innovation Center](https://www.philips.com/a-w/asiapac/careers/healthtech/locations/india/healthcare-innovation-centre.html), July 2013 - May 2015
+* Master of Technology, Biomedical Design, [Indian Institute of Technology Madras](https://www.iitm.ac.in/), June 2012 - May 2013
+* Bachelor of Technology, Engineering Design, [Indian Institute of Technology Madras](https://www.iitm.ac.in/), August 2008 - May 2012
