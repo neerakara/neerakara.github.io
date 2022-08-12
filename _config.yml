@@ -10,7 +10,7 @@ locale                   : "en-US"
 title                    : "Home"
 title_separator          : "-"
 name                     : &name "Neerav Karani"
-description              : &description "Postdoc, ETH Zurich"
+description              : &description "Postdoc, MIT"
 url                      : https://neerakara.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "neerakara/neerakara.github.io"
@@ -81,13 +81,13 @@ analytics:
 # Site Author
 author:
   name             : "Neerav Karani"
-  avatar           : "nirav_patrika.jpg"
-  bio              : "Postdoc, ETH Zurich"
+  avatar           : "neerav_id_picture.jpg"
+  bio              : "Postdoc, MIT"
   location         : 
   employer         :
   pubmed           : 
   googlescholar    : "https://scholar.google.ch/citations?user=neLQ1MQAAAAJ&hl=en"
-  email            : "nkarani@vision.ee.ethz.ch"
+  email            : "nkarani@csail.mit.edu"
   researchgate     : 
   uri              :
   bitbucket        :
