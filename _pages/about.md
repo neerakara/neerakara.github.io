@@ -16,7 +16,7 @@ I am a postdoc in [Polina Golland](https://people.csail.mit.edu/polina/)'s group
 
 ### Research
 ---
-My research focusses on developing machine learning methods for medical image acquisition and analyses. Such methods aim to condense high-dimensional pixel arrays (images) into high-level information that can aid diagnosis, treatment or clinical research. Furthermore, automated algorithms can also help improve image acquisition directly by reducing scan times or amount of radiation deposited to a patient, as well as by improving image quality.
+My research focusses on developing machine learning methods for medical image acquisition and analyses. Such methods aim to condense high-dimensional pixel arrays (images) into high-level semantic information that can aid diagnosis, treatment or clinical research. Furthermore, automated algorithms can also help improve image acquisition directly by reducing scan times or amount of radiation deposited to a patient, as well as by improving image quality.
 
 To this end, my main research interests are two-fold.
 
