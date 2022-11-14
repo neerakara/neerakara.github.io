@@ -12,15 +12,17 @@ redirect_from:
 
 ### About me
 ---
-I am a postdoc in [Polina Golland](https://people.csail.mit.edu/polina/)'s group at [MIT](https://web.mit.edu/), funded by the [Swiss National Science Foundation](https://www.snf.ch/en)'s [mobility fellowship](https://www.snf.ch/en/XIZpfY3iVS5KRRoD/funding/careers/postdoc-mobility). Before coming to the US, I completed my PhD, advised by [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/) in the [Biomedical Image Computing group](https://bmic.ee.ethz.ch/research.html) at the [Computer Vision Institute](http://www.vision.ee.ethz.ch/en/) at [ETH Zurich](https://www.ethz.ch/en.html). 
+I am a postdoc in [Polina Golland](https://people.csail.mit.edu/polina/)'s group at [MIT](https://web.mit.edu/), funded by the [Swiss National Science Foundation](https://www.snf.ch/en)'s [mobility fellowship](https://www.snf.ch/en/XIZpfY3iVS5KRRoD/funding/careers/postdoc-mobility). Before coming to the US, I completed my PhD, advised by [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/) in the [Biomedical Image Computing group](https://bmic.ee.ethz.ch/research.html) at [ETH Zurich](https://www.ethz.ch/en.html).
 
 ### Research
 ---
-I study distribution shifts in machine learning methods for medical image analyses. Such shifts are a hindrance in many machine learning methods and for several kinds of image analyses, ranging from segmentation, classification, enhancement to anomaly detection. In particular, the performance of the otherwise highly successful deep learning methods is also substantially marred in the face of such shifts.
+My research focusses on developing machine learning methods for medical image acquisition and analyses. Such methods aim to condense hard-to-interpret arrays of pixels (images) into actionable high-level information that can aid diagnosis, treatment and clinical research. Furthermore, automated algorithms can also help improve image acquisition directly by reducing scan times or amount of radiation deposited to a patient, as well as by improving image quality.
 
-In our research, we focus on machine learning settings of domain generalization and continual learning, which are especially suitable for medical image analyses to deal with challenges such as small-sized annotated datasets, data privacy concerns and the ubiquitous distributions shifts due to rapidly changing imaging protocols.
+To this end, my main research interests are two-fold.
 
-We consider a wide spectrum of distribution shifts, including those caused by changes in acquisition protocols as well as population demographics. Progress in this research direction can greatly enhance the trustworthiness and reliability of machine learning methods, thereby facilitating their translation into clinical practice, and ultimately improving the efficiency and reach of healthcare systems.
+One, I particularly enjoy designing theoretically-grounded predictive algorithms that work robustly in clinical settings, while relying on only small-sized annotated datasets and respecting data privacy concerns. I firmly believe that progress in this research direction can greatly enhance the trustworthiness and scalability of machine learning methods, thereby facilitating their translation into clinical practice, and ultimately improving the efficiency and reach of healthcare systems.
+
+Two, I am interested in uncovering causal interactions in multivariate data, and in building statistical generative models for high-dimensional data understanding and manipulation.
 
 ### Short CV
 ---
