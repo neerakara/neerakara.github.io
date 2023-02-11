@@ -12,7 +12,7 @@ redirect_from:
 
 ### About me
 ---
-I am a postdoc in [Polina Golland](https://people.csail.mit.edu/polina/)'s group at [MIT](https://web.mit.edu/), funded by the [Swiss National Science Foundation](https://www.snf.ch/en)'s [mobility fellowship](https://www.snf.ch/en/XIZpfY3iVS5KRRoD/funding/careers/postdoc-mobility). Before coming to the US, I completed my PhD, advised by [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/) in the [Biomedical Image Computing group](https://bmic.ee.ethz.ch/research.html) at [ETH Zurich](https://www.ethz.ch/en.html).
+I am a postdoc in [Polina Golland](https://people.csail.mit.edu/polina/)'s group at [MIT](https://web.mit.edu/), funded by the [Swiss National Science Foundation](https://www.snf.ch/en)'s [mobility fellowship](https://www.snf.ch/en/XIZpfY3iVS5KRRoD/funding/careers/postdoc-mobility). In 2022, I obtained my PhD from [ETH Zurich](https://www.ethz.ch/en.html), advised by [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/).
 
 ### Research
 ---
