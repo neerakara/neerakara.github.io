@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2026-03-13">
 
-<title>Posts – Neerav Karani</title>
+<title>Basic elements of gradient-based optimization – Neerav Karani</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +31,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -70,35 +69,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-date',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -159,7 +129,7 @@ window.Quarto = {
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../posts/index.html" aria-current="page"> 
+    <a class="nav-link" href="../posts/index.html"> 
 <span class="menu-text">Posts</span></a>
   </li>  
 </ul>
@@ -181,7 +151,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Posts</h1>
+<h1 class="title">Basic elements of gradient-based optimization</h1>
 </div>
 
 
@@ -189,6 +159,12 @@ window.Quarto = {
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 13, 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -198,29 +174,90 @@ window.Quarto = {
 </header>
 
 
+<div class="callout callout-style-default callout-note callout-titled" title="1. Setup">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Setup
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Consider a model <span class="math inline">\(f_\theta\)</span> trained via supervised learning to classify inputs <span class="math inline">\(x\)</span> into <span class="math inline">\(k\)</span> classes. The model produces logits <span class="math inline">\(z = f_\theta(x) \in \mathbb{R}^k\)</span>, which are converted into predicted class probabilities via the softmax function: <span class="math inline">\(\hat{y} = \sigma(z) \in \mathbb{R}^k\)</span>. The ground-truth label is represented as a one-hot vector <span class="math inline">\(y\)</span>. Training finds parameters that minimize a loss between predicted and ground-truth labels over a dataset: <span class="math inline">\(\theta^* = \arg\min_{\theta} \sum_{n=1}^{N} \ell(y_n, \hat{y}_n)\)</span></p>
+<p><strong>Dimensions:</strong></p>
+<ul>
+<li><span class="math inline">\(x \in \mathbb{R}^{d}\)</span></li>
+<li><span class="math inline">\(\theta \in \mathbb{R}^{p}\)</span></li>
+<li><span class="math inline">\(z, \hat{y}, y \in \mathbb{R}^k\)</span></li>
+</ul>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled" title="2. Three key objects">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Three key objects
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Solving the optimization requires understanding how the loss and model outputs change as parameters move through <span class="math inline">\(\mathbb{R}^p\)</span>. Three mathematical objects characterize this:</p>
+<ul>
+<li>the <strong>Gradient</strong> <span class="math inline">\(\nabla_\theta \ell \in \mathbb{R}^p\)</span> (first-order change of the (scalar) loss w.r.t. (vector) <span class="math inline">\(\theta\)</span>)</li>
+<li>the <strong>Jacobian</strong> <span class="math inline">\(J_\theta \in \mathbb{R}^{k \times p}\)</span> (first-order change of the (vector) logits w.r.t. (vector) <span class="math inline">\(\theta\)</span>)</li>
+<li>the <strong>Hessian</strong> <span class="math inline">\(H_\theta \in \mathbb{R}^{p \times p}\)</span> (second-order change of the (scalar) loss w.r.t. (vector) <span class="math inline">\(\theta\)</span>)</li>
+</ul>
+<section id="a.-gradient" class="level4">
+<h4 class="anchored" data-anchor-id="a.-gradient">2a. Gradient</h4>
+<p>The gradient <span class="math inline">\(\nabla_\theta \ell(y, f_\theta(x)) \in \mathbb{R}^p\)</span> measures how the loss changes with each parameter. It points in the direction of steepest increase of the loss. Gradient descent steps in the opposite direction: <span class="math inline">\(\theta_{t+1} = \theta_t - \eta \, \nabla_\theta \ell(y, f_\theta(x))\)</span>, where <span class="math inline">\(\eta\)</span> is the learning rate.</p>
+</section>
+<section id="b.-jacobian" class="level4">
+<h4 class="anchored" data-anchor-id="b.-jacobian">2b. Jacobian</h4>
+<p>The Jacobian <span class="math inline">\(J_    heta = \frac{\partial f_\theta(x)}{\partial \theta} \in \mathbb{R}^{k \times p}\)</span> captures how each output logit <span class="math inline">\(z_i\)</span> changes with each parameter:</p>
+<p><span class="math display">\[J_\theta = \begin{bmatrix} \frac{\partial z_1}{\partial \theta_1} &amp; \cdots &amp; \frac{\partial z_1}{\partial \theta_p} \\ \vdots &amp; \ddots &amp; \vdots \\ \frac{\partial z_k}{\partial \theta_1} &amp; \cdots &amp; \frac{\partial z_k}{\partial \theta_p} \end{bmatrix}\]</span></p>
+<p>Its <span class="math inline">\(i\)</span>-th row is <span class="math inline">\(\frac{\partial z_i}{\partial \theta} \in \mathbb{R}^p\)</span>, describing the sensitivity of class <span class="math inline">\(i\)</span> to all parameters.</p>
+</section>
+<section id="c.-hessian" class="level4">
+<h4 class="anchored" data-anchor-id="c.-hessian">2c. Hessian</h4>
+<p>The Hessian <span class="math inline">\(H_\theta = \nabla_\theta^2 \ell \in \mathbb{R}^{p \times p}\)</span> measures the curvature of the loss landscape:</p>
+<p><span class="math display">\[H_\theta = \begin{bmatrix} \frac{\partial^2 \ell}{\partial \theta_1^2} &amp; \cdots &amp; \frac{\partial^2 \ell}{\partial \theta_1 \partial \theta_p} \\ \vdots &amp; \ddots &amp; \vdots \\ \frac{\partial^2 \ell}{\partial \theta_p \partial \theta_1} &amp; \cdots &amp; \frac{\partial^2 \ell}{\partial \theta_p^2} \end{bmatrix}\]</span></p>
+<p>Large eigenvalues of <span class="math inline">\(H_\theta\)</span> indicate sharp curvature, while small eigenvalues indicate flat directions. Computing the full Hessian is usually infeasible for modern networks due to its <span class="math inline">\(p \times p\)</span> size.</p>
+</section>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note callout-titled" title="3. Backpropagation">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Backpropagation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Gradient descent requires <span class="math inline">\(\nabla_\theta \ell(y, f_\theta(x)) \in \mathbb{R}^p\)</span>, the gradient of the scalar loss w.r.t. model parameters. By the chain rule, this is a vector-Jacobian product (VJP): <span class="math inline">\(\nabla_\theta \ell = \frac{\partial \ell}{\partial \theta} = \frac{\partial \ell}{\partial z} \frac{\partial z}{\partial \theta} = (\nabla_z \ell)^T J_\theta\)</span> where <span class="math inline">\(\nabla_z \ell \in \mathbb{R}^k\)</span> is the gradient of the loss w.r.t. the logits, and <span class="math inline">\(J_\theta \in \mathbb{R}^{k \times p}\)</span> is the Jacobian of the logits w.r.t. the parameters.</p>
+<p>Backpropagation computes this VJP efficiently by traversing the computation graph in reverse, accumulating gradients layer by layer without ever materializing <span class="math inline">\(J_\theta\)</span>. This costs <span class="math inline">\(O(p)\)</span> and is achieved in a single backward pass, the same order as the forward pass.</p>
+<p>The naive alternative would be to form <span class="math inline">\(J_\theta\)</span> explicitly row by row and then multiply. This requires <span class="math inline">\(k\)</span> backward passes at <span class="math inline">\(O(kp)\)</span> compute, and storing the full <span class="math inline">\(k \times p\)</span> matrix in memory. For modern networks where <span class="math inline">\(p\)</span> can be in the billions, both the <span class="math inline">\(k\times\)</span> compute overhead and the <span class="math inline">\(k \times p\)</span> memory cost make explicit Jacobian materialization infeasible.</p>
+</div>
+</div>
+</div>
+<hr>
 
 
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-listing-date-sort="1773356400000" data-listing-file-modified-sort="1773411085864" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="511">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/optimization_basics.html" class="no-external">Basic elements of gradient-based optimization</a>
-</h3>
-</div>
-<div class="metadata">
-<a href="../posts/optimization_basics.html" class="no-external">
-<div class="listing-date">
-Mar 13, 2026
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
