@@ -13,9 +13,12 @@ Two, I am interested in uncovering causal interactions in multivariate data, and
 
 ## Short CV
 * Research Scientist, [VIRDX](https://www.virdx.com), August 2024 - Present.
-* Postdoctoral Fellow, [MIT](https://web.mit.edu/), July 2022 - July 2024. Advisor: [Polina Golland](https://people.csail.mit.edu/polina/), funding: [Swiss National Science Foundation](https://www.snf.ch/en).
-* Postdoctoral Fellow, [ETH Zurich](https://www.ethz.ch/en.html), March 2022 - June 2022. Advisor: [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/).
-* Doctor of Science (PhD), [ETH Zurich](https://www.ethz.ch/en.html), July 2017 - February 2022. Advisor: [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/).
+* Postdoctoral Fellow, [MIT](https://web.mit.edu/), July 2022 - July 2024.
+    * Advisor: [Polina Golland](https://people.csail.mit.edu/polina/), funding: [Swiss National Science Foundation](https://www.snf.ch/en).
+* Postdoctoral Fellow, [ETH Zurich](https://www.ethz.ch/en.html), March 2022 - June 2022.
+    * Advisor: [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/).
+* Doctor of Science (PhD), [ETH Zurich](https://www.ethz.ch/en.html), July 2017 - February 2022.
+    * Advisor: [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/).
 * Master of Science, Biomedical Imaging, [ETH Zurich](https://www.ethz.ch/en.html), September 2015 - April 2017.
 * Senior Electrical Engineer, [Philips Healthcare Innovation Center](https://www.philips.com/a-w/asiapac/careers/healthtech/locations/india/healthcare-innovation-centre.html), July 2013 - May 2015.
 * Master of Technology, Biomedical Design, [Indian Institute of Technology Madras](https://www.iitm.ac.in/), June 2012 - May 2013.
