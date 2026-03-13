@@ -2,8 +2,7 @@
   {
     "listing": "/posts/index.html",
     "items": [
-      "/posts/optimization/optimization_basics.html",
-      "/posts/stats/mutual_info.html"
+      "/posts/optimization/optimization_basics.html"
     ]
   }
 ]
