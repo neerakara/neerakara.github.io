@@ -1,0 +1,77 @@
+---
+title: "Mutual Information"
+description: "Measuring statistical dependence between random variables"
+categories: [Statistics]
+---
+
+::::: {.callout-note collapse="true" icon="false"}
+## 1. Statistical dependence
+
+Two random variables $X$ and $Y$ are **statistically dependent** if observing $X$ makes some values of $Y$ more or less likely, or vice versa.
+Formally, this means that the conditional distribution differs from the marginal distribution, i.e. $p(y \mid x) \neq p(y)$, for some values of $x$ and $y$.
+
+Conversely, $X$ and $Y$ are **statistically independent** if and only if $p(y \mid x) = p(y)$, for all $x$ and $y$.
+Using the chain rule of probability ($p(x,y) = p(x)\,p(y \mid x)$),
+this implies that the joint distribution factorizes as the product of marginals: $p(x,y) = p(x)\,p(y)$.
+
+::: {.callout-note icon="false"}
+## Summary
+
+- **Statistical dependence**: $p(y \mid x) \neq p(y)$
+- **Statistical independence**: $p(y \mid x) = p(y)$
+:::
+:::::
+
+::: {.callout-note collapse="true" icon="false"}
+## 2. Statistical dependence quantification - motivation
+
+Statements like $p(y \mid x) \neq p(y)$ or $p(y \mid x) = p(y)$
+tell us *whether* two variables are statistically dependent.
+In many machine learning problems, however,
+we are also interested in measuring (and often optimizing) the **degree of statistical dependence** between variables,
+i.e. how much observing one variable changes the distribution of the other.
+
+For instance, in representation learning,
+we often want to learn features $Z = f_\theta(X)$ from an input $X$ such that $Z$ is maximally statistically dependent on $X$.
+Similarly, in multi-view or multimodal input setups, we have multiple measurements of the same underlying phenomenon,
+e.g. two augmented views of the same image, or images and text describing the same object.
+Here, $X$ and $Y$ are different measurements of the same latent source $Z$ (e.g. the scene content or object identity).
+A common goal here is to learn representations $Z_X = f_\theta(X), Z_Y = g_\phi(Y)$
+such that the statistical dependence between $Z_X$ and $Z_Y$ is maximized.
+:::
+
+::: {.callout-note collapse="true" icon="false"}
+## 3. Statistical dependence quantification via mutual information
+
+Recall that statistical independence means $p(x,y) = p(x)p(y)$.
+A natural way to measure the strength of dependence is therefore
+to compare the true joint distribution $p(x,y)$ with the distribution that would arise under independence $p(x)p(y)$.
+
+First, for a particular sample pair $(x,y)$, we consider the ratio $\frac{p(x,y)}{p(x)p(y)}$, which
+compares how often $(x,y)$ occurs in reality to how often it would occur if the variables were independent.
+Second, we take the logarithm of this ratio.
+The quantity $\log \frac{p(x,y)}{p(x)p(y)}$ is sometimes called the pointwise mutual information of the pair $(x,y)$.
+Finally, we average over all outcomes, weighting each pair $(x,y)$ by how frequently it occurs.
+The resulting quantity is called the **mutual information** between $X$ and $Y$:
+
+$$\boxed{I(X,Y) = \mathbb{E}_{(X,Y)}\!\left[\log \frac{p(x,y)}{p(x)p(y)}\right]}$$
+
+If $X$ and $Y$ are independent, then $p(x,y) = p(x)p(y)$ and the ratio equals $1$ everywhere, therefore $I(X,Y) = 0$.
+If not, $p(x,y) \neq p(x)p(y)$, and $I(X,Y) > 0$ (although why $>0$ is not immediately obvious from the definition).
+
+**Units**:
+The units of mutual information depend on the logarithm base (base $2$ → bits, base $e$ → nats).
+Using base $2$, mutual information can be interpreted as the
+number of bits of uncertainty about one variable that are reduced on average by observing the other.
+:::
+
+::: {.callout-note collapse="true" icon="false"}
+## 4. Challenges in computing mutual information
+
+The definition above assumes that we know the joint distribution $p(x,y)$ and the marginal distributions $p(x)$ and $p(y)$.
+In practice, however, these distributions are rarely known and must be estimated from samples.
+This becomes particularly challenging in high dimensions.
+For example, if $X$ and $Y$ are images with thousands of pixels, the joint distribution $p(x,y)$ lives in a space with thousands of dimensions.
+Accurately estimating such distributions from finite data quickly becomes infeasible.
+As a result, practical applications of mutual information typically rely on approximate estimators, lower-dimensional representations, or surrogate objectives.
+:::
