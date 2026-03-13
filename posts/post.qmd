@@ -4,11 +4,3 @@ date: 2026-03-13
 ---
 
 A first test post.
-
-An inline equation: $a^2 + b^2 = c^2$.
-
-A displayed equation:
-
-$$
-L = \sum_k (CDF_p(k) - CDF_y(k))^2
-$$

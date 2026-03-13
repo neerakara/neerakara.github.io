@@ -32,7 +32,7 @@
     "href": "posts/post.html",
     "title": "First post",
     "section": "",
-    "text": "A first test post.\nAn inline equation: \\(a^2 + b^2 = c^2\\).\nA displayed equation:\n\\[\nL = \\sum_k (CDF_p(k) - CDF_y(k))^2\n\\]"
+    "text": "A first test post."
   },
   {
     "objectID": "index.html",
