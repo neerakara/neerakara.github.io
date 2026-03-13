@@ -1,8 +1,4 @@
 ---
 title: Posts
-listing:
-  contents: "*.qmd"
-  sort: "date desc"
-  type: default
-  fields: [title, date]
+listing: default
 ---
