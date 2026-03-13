@@ -80,7 +80,7 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-title',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
       searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
     };
@@ -108,41 +108,13 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-title',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
       searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
     window['quarto-listings']['listing-stats'] = new List('listing-stats', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-medical-imaging .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: [],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-medical-imaging'] = new List('listing-medical-imaging', options);
 
     if (window['quarto-listing-loaded']) {
       window['quarto-listing-loaded']();
@@ -189,7 +161,7 @@ window.Quarto = {
 <link rel="stylesheet" href="../styles.css">
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="nav-fixed fullcontent quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -229,17 +201,7 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#optimization" id="toc-optimization" class="nav-link active" data-scroll-target="#optimization">Optimization</a></li>
-  <li><a href="#stats" id="toc-stats" class="nav-link" data-scroll-target="#stats">Stats</a></li>
-  <li><a href="#medical-imaging" id="toc-medical-imaging" class="nav-link" data-scroll-target="#medical-imaging">Medical Imaging</a></li>
-  </ul>
-</nav>
-    </div>
+    
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -262,20 +224,23 @@ window.Quarto = {
 </header>
 
 
+<div class="posts-listing-page">
 <section id="optimization" class="level2">
 <h2 class="anchored" data-anchor-id="optimization">Optimization</h2>
-<div id="listing-optimization" class="quarto-listing quarto-listing-container-default">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="T3B0aW1pemF0aW9u" data-listing-file-modified-sort="1773432733990" data-listing-reading-time-sort="5" data-listing-word-count-sort="969">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/optimization/optimization_basics.html" class="no-external">Machine Learning Optimization Basics</a>
-</h3>
+<div id="listing-optimization" class="quarto-listing quarto-listing-container-grid">
+<div class="list grid quarto-listing-cols-1">
+<div class="g-col-1" data-index="0" data-categories="T3B0aW1pemF0aW9u" data-listing-file-modified-sort="1773444455659" data-listing-reading-time-sort="5" data-listing-word-count-sort="977">
+<a href="../posts/optimization/optimization_basics.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Machine Learning Optimization Basics
+</h5>
+<div class="card-text listing-description delink">
+<p>An intro to the main objects in ML optimization: gradients, Jacobians and Hessians.</p>
 </div>
-<div class="metadata">
-<a href="../posts/optimization/optimization_basics.html" class="no-external">
-</a>
 </div>
+</div></a>
 </div>
 </div>
 <div class="listing-no-matching d-none">No matching items</div>
@@ -283,35 +248,29 @@ window.Quarto = {
 </section>
 <section id="stats" class="level2">
 <h2 class="anchored" data-anchor-id="stats">Stats</h2>
-<div id="listing-stats" class="quarto-listing quarto-listing-container-default">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="U3RhdGlzdGljcw==" data-listing-file-modified-sort="1773442279767" data-listing-reading-time-sort="3" data-listing-word-count-sort="561">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../posts/stats/mutual_info.html" class="no-external">Mutual Information</a>
-</h3>
+<div id="listing-stats" class="quarto-listing quarto-listing-container-grid">
+<div class="list grid quarto-listing-cols-1">
+<div class="g-col-1" data-index="0" data-categories="U3RhdGlzdGljcw==" data-listing-file-modified-sort="1773444681170" data-listing-reading-time-sort="3" data-listing-word-count-sort="569">
+<a href="../posts/stats/mutual_info.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Mutual Information
+</h5>
+<div class="card-text listing-description delink">
+<p>Measuring statistical dependence between random variables</p>
 </div>
-<div class="metadata">
-<a href="../posts/stats/mutual_info.html" class="no-external">
-</a>
 </div>
+</div></a>
 </div>
 </div>
 <div class="listing-no-matching d-none">No matching items</div>
 </div>
 </section>
-<section id="medical-imaging" class="level2">
-<h2 class="anchored" data-anchor-id="medical-imaging">Medical Imaging</h2>
-<div id="listing-medical-imaging" class="quarto-listing quarto-listing-container-default">
-<div class="list quarto-listing-default">
-
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
 </div>
 
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

@@ -1,28 +1,24 @@
 ---
 title: Posts
+toc: false
 listing:
   - id: optimization
     contents: "optimization/*.qmd"
-    type: default
-    sort: "date desc"
-    fields: [title]
+    type: grid
+    grid-columns: 1
+    fields: [title, description]
     filter-ui: false
     sort-ui: false
   - id: stats
     contents: "stats/*.qmd"
-    type: default
-    sort: "date desc"
-    fields: [title]
-    filter-ui: false
-    sort-ui: false
-  - id: medical-imaging
-    contents: "medical-imaging/*.qmd"
-    type: default
-    sort: "date desc"
-    fields: [title]
+    type: grid
+    grid-columns: 1
+    fields: [title, description]
     filter-ui: false
     sort-ui: false
 ---
+
+<div class="posts-listing-page">
 
 ## Optimization
 
@@ -34,7 +30,4 @@ listing:
 ::: {#stats}
 :::
 
-## Medical Imaging
-
-::: {#medical-imaging}
-:::
+</div>

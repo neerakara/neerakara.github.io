@@ -1,7 +1,13 @@
 ---
-title: Home
+toc: false
 ---
 
-Welcome. This website contains some notes on machine learning and medical imaging.
-
-You can read about me [here](about.qmd) or browse posts [here](posts/index.qmd).
+<div class="home-hero">
+<p class="home-name">Neerav Karani</p>
+<p class="home-tagline">Machine learning &amp; medical imaging</p>
+<nav class="home-links">
+  <a href="about.qmd">About</a>
+  <span class="home-sep">&middot;</span>
+  <a href="posts/index.qmd">Posts</a>
+</nav>
+</div>
