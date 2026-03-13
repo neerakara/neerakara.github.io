@@ -22,14 +22,14 @@ Two, I am interested in uncovering causal interactions in multivariate data, and
 
 <div class="timeline-item">
 <div class="timeline-date">July 2022 – July 2024</div>
-<div class="timeline-title">Postdoctoral Fellow, <a href="https://web.mit.edu/">MIT</a></div>
+<div class="timeline-title">Postdoctoral Researcher, <a href="https://web.mit.edu/">MIT</a></div>
 <div class="timeline-sub">Advisor: <a href="https://people.csail.mit.edu/polina/">Polina Golland</a></div>
 <div class="timeline-sub">Funding: <a href="https://www.snf.ch/en">Swiss National Science Foundation</a></div>
 </div>
 
 <div class="timeline-item">
 <div class="timeline-date">March 2022 – June 2022</div>
-<div class="timeline-title">Postdoctoral Fellow, <a href="https://www.ethz.ch/en.html">ETH Zurich</a></div>
+<div class="timeline-title">Postdoctoral Researcher, <a href="https://www.ethz.ch/en.html">ETH Zurich</a></div>
 <div class="timeline-sub">Advisor: <a href="http://www.vision.ee.ethz.ch/~kender/">Ender Konukoglu</a></div>
 </div>
 
