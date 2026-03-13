@@ -12,14 +12,55 @@ One, I particularly enjoy designing theoretically-grounded predictive algorithms
 Two, I am interested in uncovering causal interactions in multivariate data, and in building statistical generative models for high-dimensional data understanding and manipulation.
 
 ## Short CV
-* Research Scientist, [VIRDX](https://www.virdx.com), August 2024 - Present.
-* Postdoctoral Fellow, [MIT](https://web.mit.edu/), July 2022 - July 2024.
-    * Advisor: [Polina Golland](https://people.csail.mit.edu/polina/), funding: [Swiss National Science Foundation](https://www.snf.ch/en).
-* Postdoctoral Fellow, [ETH Zurich](https://www.ethz.ch/en.html), March 2022 - June 2022.
-    * Advisor: [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/).
-* Doctor of Science (PhD), [ETH Zurich](https://www.ethz.ch/en.html), July 2017 - February 2022.
-    * Advisor: [Ender Konukoglu](http://www.vision.ee.ethz.ch/~kender/).
-* Master of Science, Biomedical Imaging, [ETH Zurich](https://www.ethz.ch/en.html), September 2015 - April 2017.
-* Senior Electrical Engineer, [Philips Healthcare Innovation Center](https://www.philips.com/a-w/asiapac/careers/healthtech/locations/india/healthcare-innovation-centre.html), July 2013 - May 2015.
-* Master of Technology, Biomedical Design, [Indian Institute of Technology Madras](https://www.iitm.ac.in/), June 2012 - May 2013.
-* Bachelor of Technology, Engineering Design, [Indian Institute of Technology Madras](https://www.iitm.ac.in/), August 2008 - May 2012.
+
+<div class="timeline">
+
+<div class="timeline-item">
+<div class="timeline-date">August 2024 – Present</div>
+<div class="timeline-title">Research Scientist, <a href="https://www.virdx.com">VIRDX</a></div>
+</div>
+
+<div class="timeline-item">
+<div class="timeline-date">July 2022 – July 2024</div>
+<div class="timeline-title">Postdoctoral Fellow, <a href="https://web.mit.edu/">MIT</a></div>
+<div class="timeline-sub">Advisor: <a href="https://people.csail.mit.edu/polina/">Polina Golland</a></div>
+<div class="timeline-sub">Funding: <a href="https://www.snf.ch/en">Swiss National Science Foundation</a></div>
+</div>
+
+<div class="timeline-item">
+<div class="timeline-date">March 2022 – June 2022</div>
+<div class="timeline-title">Postdoctoral Fellow, <a href="https://www.ethz.ch/en.html">ETH Zurich</a></div>
+<div class="timeline-sub">Advisor: <a href="http://www.vision.ee.ethz.ch/~kender/">Ender Konukoglu</a></div>
+</div>
+
+<div class="timeline-item">
+<div class="timeline-date">July 2017 – February 2022</div>
+<div class="timeline-title">Doctor of Science (PhD), <a href="https://www.ethz.ch/en.html">ETH Zurich</a></div>
+<div class="timeline-sub">Advisor: <a href="http://www.vision.ee.ethz.ch/~kender/">Ender Konukoglu</a></div>
+<div class="timeline-sub">Thesis: <a href="https://www.research-collection.ethz.ch/bitstreams/77ded0ab-6fa3-4ae7-b310-24050d68c098/download">Tackling Distribution Shifts in Machine Learning-Based Medical Image Analysis</a></div>
+</div>
+
+<div class="timeline-item">
+<div class="timeline-date">September 2015 – April 2017</div>
+<div class="timeline-title">Master of Science, <a href="https://www.ethz.ch/en.html">ETH Zurich</a></div>
+<div class="timeline-sub"><a href="https://master-biomed.ethz.ch/education/bioimaging.html">Biomedical Imaging</a></div>
+</div>
+
+<div class="timeline-item">
+<div class="timeline-date">July 2013 – May 2015</div>
+<div class="timeline-title">Senior Electrical Engineer, <a href="https://www.philips.com/a-w/asiapac/careers/healthtech/locations/india/healthcare-innovation-centre.html">Philips Healthcare</a></div>
+</div>
+
+<div class="timeline-item">
+<div class="timeline-date">June 2012 – May 2013</div>
+<div class="timeline-title">Master of Technology, <a href="https://www.iitm.ac.in/">IIT Madras</a></div>
+<div class="timeline-sub"><a href="https://ed.iitm.ac.in/index.html">Biomedical Design</a></div>
+</div>
+
+<div class="timeline-item">
+<div class="timeline-date">August 2008 – May 2012</div>
+<div class="timeline-title">Bachelor of Technology, <a href="https://www.iitm.ac.in/">IIT Madras</a></div>
+<div class="timeline-sub"><a href="https://ed.iitm.ac.in/index.html">Engineering Design</a></div>
+</div>
+
+</div>
