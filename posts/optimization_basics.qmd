@@ -6,7 +6,7 @@ description: "An introduction to optimization in machine learning: gradients, Ja
 
 Optimization is at the core of modern machine learning.
 Training a neural network typically involves minimizing a loss function using gradient-based optimization methods such as stochastic gradient descent or Adam.
-In this post, we review the basic mathematical objects behind these algorithms: gradients, Jacobians and Hessians.
+In this post, let's review the basic mathematical objects behind these algorithms: gradients, Jacobians and Hessians.
 
 ::: {.callout-note collapse="true" title="1. Setup"}
 Consider a model $f_\theta$ trained via supervised learning to classify inputs $x$ into $k$ classes.
