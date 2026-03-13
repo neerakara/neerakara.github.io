@@ -1,0 +1,51 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "I am a postdoc in Polina Golland’s group at MIT, funded by the Swiss National Science Foundation’s mobility fellowship. In 2022, I obtained my PhD from ETH Zurich, advised by Ender Konukoglu."
+  },
+  {
+    "objectID": "about.html#about-me",
+    "href": "about.html#about-me",
+    "title": "About",
+    "section": "",
+    "text": "I am a postdoc in Polina Golland’s group at MIT, funded by the Swiss National Science Foundation’s mobility fellowship. In 2022, I obtained my PhD from ETH Zurich, advised by Ender Konukoglu."
+  },
+  {
+    "objectID": "about.html#research",
+    "href": "about.html#research",
+    "title": "About",
+    "section": "Research",
+    "text": "Research\nI develop machine learning methods for medical image acquisition and analyses. Such methods aim to condense high-dimensional pixel arrays (images) into high-level semantic information that can aid diagnosis, treatment or clinical research. Furthermore, automated algorithms can also help improve image acquisition directly by reducing scan times or amount of radiation deposited to a patient, as well as by improving image quality.\nTo this end, my main research interests are two-fold. One, I particularly enjoy designing theoretically-grounded predictive algorithms that work robustly in clinical settings, while relying on only small-sized annotated datasets and respecting data privacy concerns. Two, I am interested in uncovering causal interactions in multivariate data, and in building statistical generative models for high-dimensional data understanding and manipulation."
+  },
+  {
+    "objectID": "about.html#short-cv",
+    "href": "about.html#short-cv",
+    "title": "About",
+    "section": "Short CV",
+    "text": "Short CV\n\nPostdoctoral Fellow, Medical Image Analysis, MIT, July 2022 - July 2024\nPostdoctoral Fellow, Medical Image Analysis, ETH Zurich, March 2022 - June 2022\nDoctor of Science (PhD), Medical Image Analysis, ETH Zurich, July 2017 - February 2022\nMaster of Science, Biomedical Imaging, ETH Zurich, September 2015 - April 2017\nSenior Electrical Engineer, Philips Healthcare Innovation Center, July 2013 - May 2015\nMaster of Technology, Biomedical Design, Indian Institute of Technology Madras, June 2012 - May 2013\nBachelor of Technology, Engineering Design, Indian Institute of Technology Madras, August 2008 - May 2012"
+  },
+  {
+    "objectID": "posts/index.html",
+    "href": "posts/index.html",
+    "title": "Posts",
+    "section": "",
+    "text": "No matching items"
+  },
+  {
+    "objectID": "posts/2026-03-12-first-post.html",
+    "href": "posts/2026-03-12-first-post.html",
+    "title": "First post",
+    "section": "",
+    "text": "A first test post.\nAn inline equation: \\(a^2 + b^2 = c^2\\).\nA displayed equation:\n\\[\nL = \\sum_k (CDF_p(k) - CDF_y(k))^2\n\\]"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "Welcome. This is a small blog for notes on machine learning, medical imaging, and research.\nYou can start with the About page or browse Posts."
+  }
+]
