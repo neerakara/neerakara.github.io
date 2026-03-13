@@ -1,7 +1,7 @@
 ---
-title: "Machine Learning Optimization Basics: Gradients, Jacobians, Hessians"
+title: "Machine Learning Optimization Basics"
 date: 2026-03-13
-description: "An introduction to optimization in machine learning: gradients, Jacobians, Hessians, backpropagation and Adam."
+description: "An intro to the main objects in ML optimization: gradients, Jacobians and Hessians."
 ---
 
 Optimization is at the core of modern machine learning.
