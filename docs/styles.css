@@ -1,5 +1,37 @@
 /* css styles */
 
+/* Hide post date */
+.quarto-title .quarto-title-meta-heading,
+.quarto-title .quarto-title-meta-contents {
+  display: none;
+}
+
+/* Left-align listing post titles */
+.quarto-listing .listing-title {
+  text-align: left;
+}
+
+.quarto-listing .list-group-item {
+  text-align: left;
+}
+
+.quarto-post {
+  text-align: left;
+}
+
+.quarto-post .body {
+  text-align: left;
+}
+
+.quarto-post.image-right {
+  display: block;
+}
+
+.quarto-post.image-right .body {
+  width: 100%;
+  text-align: left;
+}
+
 /* Timeline */
 .timeline {
   position: relative;

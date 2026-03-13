@@ -2,6 +2,7 @@
 title: "Machine Learning Optimization Basics"
 date: 2026-03-13
 description: "An intro to the main objects in ML optimization: gradients, Jacobians and Hessians."
+categories: [Optimization]
 ---
 
 Optimization is at the core of modern machine learning.
