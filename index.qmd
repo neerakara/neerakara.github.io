@@ -2,6 +2,6 @@
 title: Home
 ---
 
-Welcome. This is a small blog for notes on machine learning, medical imaging, and research.
+Welcome. This website contains some notes on machine learning and medical imaging.
 
-You can start with the [About](about.qmd) page or browse [Posts](posts/index.qmd).
+You can read about me [here](about.qmd) or browse posts [here](posts/index.qmd).
