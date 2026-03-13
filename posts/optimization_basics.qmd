@@ -13,13 +13,14 @@ Consider a model $f_\theta$ trained via supervised learning to classify inputs $
 The model produces logits $z = f_\theta(x) \in \mathbb{R}^k$, which are converted into predicted class probabilities via the softmax function: $\hat{y} = \sigma(z) \in \mathbb{R}^k$.
 The ground-truth label is represented as a one-hot vector $y$.
 Training finds parameters that minimize a loss between predicted and ground-truth labels over a dataset:
-$\theta^* = \arg\min_{\theta} \sum_{n=1}^{N} \ell(y_n, \hat{y}_n)$
+$\theta^* = \arg\min_{\theta} \sum_{n=1}^{N} \ell(y_n, \hat{y}_n)$.
 
 **Dimensions:**
 
 - $x \in \mathbb{R}^{d}$
 - $\theta \in \mathbb{R}^{p}$
 - $z, \hat{y}, y \in \mathbb{R}^k$
+- $\ell: \mathbb{R}^k \times \mathbb{R}^k \to \mathbb{R}$
 :::
 
 ---

@@ -193,12 +193,13 @@ window.Quarto = {
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Consider a model <span class="math inline">\(f_\theta\)</span> trained via supervised learning to classify inputs <span class="math inline">\(x\)</span> into <span class="math inline">\(k\)</span> classes. The model produces logits <span class="math inline">\(z = f_\theta(x) \in \mathbb{R}^k\)</span>, which are converted into predicted class probabilities via the softmax function: <span class="math inline">\(\hat{y} = \sigma(z) \in \mathbb{R}^k\)</span>. The ground-truth label is represented as a one-hot vector <span class="math inline">\(y\)</span>. Training finds parameters that minimize a loss between predicted and ground-truth labels over a dataset: <span class="math inline">\(\theta^* = \arg\min_{\theta} \sum_{n=1}^{N} \ell(y_n, \hat{y}_n)\)</span></p>
+<p>Consider a model <span class="math inline">\(f_\theta\)</span> trained via supervised learning to classify inputs <span class="math inline">\(x\)</span> into <span class="math inline">\(k\)</span> classes. The model produces logits <span class="math inline">\(z = f_\theta(x) \in \mathbb{R}^k\)</span>, which are converted into predicted class probabilities via the softmax function: <span class="math inline">\(\hat{y} = \sigma(z) \in \mathbb{R}^k\)</span>. The ground-truth label is represented as a one-hot vector <span class="math inline">\(y\)</span>. Training finds parameters that minimize a loss between predicted and ground-truth labels over a dataset: <span class="math inline">\(\theta^* = \arg\min_{\theta} \sum_{n=1}^{N} \ell(y_n, \hat{y}_n)\)</span>.</p>
 <p><strong>Dimensions:</strong></p>
 <ul>
 <li><span class="math inline">\(x \in \mathbb{R}^{d}\)</span></li>
 <li><span class="math inline">\(\theta \in \mathbb{R}^{p}\)</span></li>
 <li><span class="math inline">\(z, \hat{y}, y \in \mathbb{R}^k\)</span></li>
+<li><span class="math inline">\(\ell: \mathbb{R}^k \times \mathbb{R}^k \to \mathbb{R}\)</span></li>
 </ul>
 </div>
 </div>
