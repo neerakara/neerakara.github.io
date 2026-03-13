@@ -1,8 +1,40 @@
 ---
 title: Posts
 listing:
-  contents: "*.qmd"
-  type: default
-  sort: "date desc"
-  fields: [title, date]
+  - id: optimization
+    contents: "optimization/*.qmd"
+    type: default
+    sort: "date desc"
+    fields: [title]
+    filter-ui: false
+    sort-ui: false
+  - id: stats
+    contents: "stats/*.qmd"
+    type: default
+    sort: "date desc"
+    fields: [title]
+    filter-ui: false
+    sort-ui: false
+  - id: medical-imaging
+    contents: "medical-imaging/*.qmd"
+    type: default
+    sort: "date desc"
+    fields: [title]
+    filter-ui: false
+    sort-ui: false
 ---
+
+## Optimization
+
+::: {#optimization}
+:::
+
+## Stats
+
+::: {#stats}
+:::
+
+## Medical Imaging
+
+::: {#medical-imaging}
+:::

@@ -1,14 +1,14 @@
 ---
 title: "Machine Learning Optimization Basics"
-date: 2026-03-13
 description: "An intro to the main objects in ML optimization: gradients, Jacobians and Hessians."
+categories: [Optimization]
 ---
 
 Optimization is at the core of modern machine learning.
 Training a neural network typically involves minimizing a loss function using gradient-based optimization methods such as stochastic gradient descent or Adam.
 In this post, let's review the basic mathematical objects behind these algorithms: gradients, Jacobians and Hessians.
 
-::: {.callout-note collapse="true" title="1. Setup"}
+::: {.callout-note collapse="true" icon="false" title="1. Setup"}
 Consider a model $f_\theta$ trained via supervised learning to classify inputs $x$ into $k$ classes.
 The model produces logits $z = f_\theta(x) \in \mathbb{R}^k$, which are converted into predicted class probabilities via the softmax function: $\hat{y} = \sigma(z) \in \mathbb{R}^k$.
 The ground-truth label is represented as a one-hot vector $y$.
@@ -25,7 +25,7 @@ $\theta^* = \arg\min_{\theta} \sum_{n=1}^{N} \ell(y_n, \hat{y}_n)$.
 
 ---
 
-::: {.callout-note collapse="true" title="2. Gradients, Jacobians and Hessians"}
+::: {.callout-note collapse="true" icon="false" title="2. Gradients, Jacobians and Hessians"}
 Solving the optimization requires understanding how the loss and model outputs change as parameters move through $\mathbb{R}^p$.
 Three mathematical objects characterize this:
 
@@ -65,7 +65,7 @@ Computing the full Hessian is usually infeasible for modern networks due to its 
 
 ---
 
-::: {.callout-note collapse="true" title="3. Backpropagation as a Vector–Jacobian Product"}
+::: {.callout-note collapse="true" icon="false" title="3. Backpropagation as a Vector–Jacobian Product"}
 Gradient descent requires $\nabla_\theta \ell(y, f_\theta(x)) \in \mathbb{R}^p$, the gradient of the scalar loss w.r.t. model parameters.
 By the chain rule, this is a vector-Jacobian product (VJP):
 $\nabla_\theta \ell = \frac{\partial \ell}{\partial \theta} = \frac{\partial \ell}{\partial z} \frac{\partial z}{\partial \theta} = (\nabla_z \ell)^T J_\theta$
@@ -83,7 +83,7 @@ For modern networks where $p$ can be in the billions, both the $k\times$ compute
 
 ---
 
-::: {.callout-note collapse="true" title="4. Hessian approximations in practice"}
+::: {.callout-note collapse="true" icon="false" title="4. Hessian approximations in practice"}
 
 
 **Why the Hessian matters**
@@ -123,7 +123,7 @@ scaling each parameter's update according to its historical gradient magnitude.
 ---
 
 
-::: {.callout-note collapse="true" title="Appendix A: Newton's method from a Taylor expansion" #appendix-a}
+::: {.callout-note collapse="true" icon="false" title="Appendix A: Newton's method from a Taylor expansion" #appendix-a}
 The motivation for Newton's update comes from minimizing a local quadratic approximation of the loss.
 Expanding $\ell(\theta)$ around $\theta_t$ via a second-order Taylor expansion:
 $\ell(\theta) \approx \ell(\theta_t) + \nabla_\theta \ell^\top (\theta - \theta_t) + \frac{1}{2}(\theta - \theta_t)^\top H_\theta (\theta - \theta_t)$.
@@ -132,7 +132,7 @@ $\nabla_\theta \ell + H_\theta (\theta - \theta_t) = 0 \implies \theta = \theta_
 Thus, Newton's update finds the exact minimum of the local quadratic approximation in one step, rather than just following the gradient with a fixed step size.
 :::
 
-::: {.callout-note collapse="true" title="Appendix B: Diagonal Hessian Approximation" #appendix-b}
+::: {.callout-note collapse="true" icon="false" title="Appendix B: Diagonal Hessian Approximation" #appendix-b}
 
 For likelihood-based models, curvature can be approximated with squared gradients!
 Starting from the normalization condition, $\int p(y|x,\theta)\, dy = 1$,
