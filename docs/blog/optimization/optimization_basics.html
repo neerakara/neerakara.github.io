@@ -253,8 +253,11 @@ window.Quarto = {
 </div>
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
+<p><strong>Why the Jacobian matters</strong></p>
 <p>The Jacobian <span class="math inline">\(J_\theta\)</span> is crucial in the computation of gradients via the chain rule, and is central to how neural networks are trained.</p>
 <p>Gradient descent requires <span class="math inline">\(\nabla_\theta \ell(y, f_\theta(x)) \in \mathbb{R}^p\)</span>, the gradient of the scalar loss w.r.t. model parameters. By the chain rule, this is a vector-Jacobian product (VJP): <span class="math inline">\(\nabla_\theta \ell = \frac{\partial \ell}{\partial \theta} = \frac{\partial \ell}{\partial z} \frac{\partial z}{\partial \theta} = (\nabla_z \ell)^T J_\theta\)</span> where <span class="math inline">\(\nabla_z \ell \in \mathbb{R}^k\)</span> is the gradient of the loss w.r.t. the logits, and <span class="math inline">\(J_\theta \in \mathbb{R}^{k \times p}\)</span> is the Jacobian of the logits w.r.t. the parameters.</p>
+<hr>
+<p><strong>Computing Gradients efficiently</strong></p>
 <p>Backpropagation computes this VJP efficiently by traversing the computation graph in reverse, accumulating gradients layer by layer without ever materializing <span class="math inline">\(J_\theta\)</span>. This costs <span class="math inline">\(O(p)\)</span> and is achieved in a single backward pass, the same order as the forward pass.</p>
 <p>The naive alternative would be to form <span class="math inline">\(J_\theta\)</span> explicitly row by row and then multiply. This requires <span class="math inline">\(k\)</span> backward passes at <span class="math inline">\(O(kp)\)</span> compute, and storing the full <span class="math inline">\(k \times p\)</span> matrix in memory. For modern networks where <span class="math inline">\(p\)</span> can be in the billions, both the <span class="math inline">\(k\times\)</span> compute overhead and the <span class="math inline">\(k \times p\)</span> memory cost make explicit Jacobian materialization infeasible.</p>
 </div>

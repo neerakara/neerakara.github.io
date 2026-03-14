@@ -72,6 +72,9 @@ Computing the full Hessian is usually infeasible for modern networks due to its 
 ---
 
 ::: {.callout-note collapse="true" icon="false" title="3. Backpropagation as a Vector–Jacobian Product"}
+
+**Why the Jacobian matters**
+
 The Jacobian $J_\theta$ is crucial in the computation of gradients via the chain rule, and is central to how neural networks are trained.
 
 Gradient descent requires $\nabla_\theta \ell(y, f_\theta(x)) \in \mathbb{R}^p$, the gradient of the scalar loss w.r.t. model parameters.
@@ -79,6 +82,10 @@ By the chain rule, this is a vector-Jacobian product (VJP):
 $\nabla_\theta \ell = \frac{\partial \ell}{\partial \theta} = \frac{\partial \ell}{\partial z} \frac{\partial z}{\partial \theta} = (\nabla_z \ell)^T J_\theta$
 where $\nabla_z \ell \in \mathbb{R}^k$ is the gradient of the loss w.r.t. the logits,
 and $J_\theta \in \mathbb{R}^{k \times p}$ is the Jacobian of the logits w.r.t. the parameters.
+
+---
+
+**Computing Gradients efficiently**
 
 Backpropagation computes this VJP efficiently by traversing the computation graph in reverse, accumulating gradients layer by layer without ever materializing $J_\theta$.
 This costs $O(p)$ and is achieved in a single backward pass, the same order as the forward pass.
