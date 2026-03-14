@@ -8,6 +8,6 @@ toc: false
 <nav class="home-links">
   <a href="about.qmd">About</a>
   <span class="home-sep">&middot;</span>
-  <a href="posts/index.qmd">Posts</a>
+  <a href="blog/index.qmd">Blog</a>
 </nav>
 </div>

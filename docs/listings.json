@@ -1,9 +1,9 @@
 [
   {
-    "listing": "/posts/index.html",
+    "listing": "/blog/index.html",
     "items": [
-      "/posts/optimization/optimization_basics.html",
-      "/posts/stats/mutual_info.html"
+      "/blog/optimization/optimization_basics.html",
+      "/blog/stats/mutual_info.html"
     ]
   }
 ]
