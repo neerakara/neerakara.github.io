@@ -176,7 +176,7 @@ window.Quarto = {
 </header>
 
 
-<p>Optimization is at the core of modern machine learning. Training a neural network typically involves minimizing a loss function using gradient-based optimization methods such as stochastic gradient descent or Adam. In this post, let’s review the basic mathematical objects behind these algorithms: gradients, Jacobians and Hessians.</p>
+<p>Optimization is at the core of modern machine learning. Training a neural network typically involves minimizing a loss function using gradient-based optimization methods such as stochastic gradient descent or <a href="https://arxiv.org/abs/1412.6980">Adam</a>. In this post, let’s review the basic mathematical objects behind these algorithms: gradients, Jacobians and Hessians.</p>
 <!--
 ![](optimization_basics.png)
 
@@ -253,6 +253,7 @@ window.Quarto = {
 </div>
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
+<p>The Jacobian <span class="math inline">\(J_\theta\)</span> is crucial in the computation of gradients via the chain rule, and is central to how neural networks are trained.</p>
 <p>Gradient descent requires <span class="math inline">\(\nabla_\theta \ell(y, f_\theta(x)) \in \mathbb{R}^p\)</span>, the gradient of the scalar loss w.r.t. model parameters. By the chain rule, this is a vector-Jacobian product (VJP): <span class="math inline">\(\nabla_\theta \ell = \frac{\partial \ell}{\partial \theta} = \frac{\partial \ell}{\partial z} \frac{\partial z}{\partial \theta} = (\nabla_z \ell)^T J_\theta\)</span> where <span class="math inline">\(\nabla_z \ell \in \mathbb{R}^k\)</span> is the gradient of the loss w.r.t. the logits, and <span class="math inline">\(J_\theta \in \mathbb{R}^{k \times p}\)</span> is the Jacobian of the logits w.r.t. the parameters.</p>
 <p>Backpropagation computes this VJP efficiently by traversing the computation graph in reverse, accumulating gradients layer by layer without ever materializing <span class="math inline">\(J_\theta\)</span>. This costs <span class="math inline">\(O(p)\)</span> and is achieved in a single backward pass, the same order as the forward pass.</p>
 <p>The naive alternative would be to form <span class="math inline">\(J_\theta\)</span> explicitly row by row and then multiply. This requires <span class="math inline">\(k\)</span> backward passes at <span class="math inline">\(O(kp)\)</span> compute, and storing the full <span class="math inline">\(k \times p\)</span> matrix in memory. For modern networks where <span class="math inline">\(p\)</span> can be in the billions, both the <span class="math inline">\(k\times\)</span> compute overhead and the <span class="math inline">\(k \times p\)</span> memory cost make explicit Jacobian materialization infeasible.</p>
@@ -278,7 +279,7 @@ window.Quarto = {
 <p><strong>Diagonal curvature approximation</strong></p>
 <p>A common simplification is to approximate only the diagonal of the Hessian. This gives a per-parameter learning rate: <span class="math inline">\(\theta_{t+1,i} = \theta_{t,i} - \eta \, \frac{\nabla_{\theta_i}\ell}{\sqrt{h_i}}\)</span>, where <span class="math inline">\(h_i\)</span> estimates the curvature of parameter <span class="math inline">\(i\)</span>. For likelihood-based losses, the diagonal of the expected Hessian can be approximated using squared gradients (see <a href="#appendix-b">Appendix B</a>): <span class="math inline">\(\text{diag}(\mathbb{E}[H_\theta]) \approx \mathbb{E}[(\nabla_\theta \ell)^2]\)</span>. This makes curvature estimation possible using gradients alone!</p>
 <hr>
-<p><strong>Adam</strong></p>
+<p><strong><a href="https://arxiv.org/abs/1412.6980">Adam</a></strong></p>
 <p>Adam maintains running estimates of the first and second moments of the gradient: <span class="math inline">\(m_t = \beta_1 m_{t-1} + (1-\beta_1)\nabla_\theta \ell\)</span>, <span class="math inline">\(v_t = \beta_2 v_{t-1} + (1-\beta_2)(\nabla_\theta \ell)^2\)</span> and updates parameters as <span class="math inline">\(\theta_{t+1} = \theta_t - \eta \frac{m_t}{\sqrt{v_t}+\epsilon}\)</span>. The denominator <span class="math inline">\(\sqrt{v_t}\)</span> acts as a diagonal curvature estimate, scaling each parameter’s update according to its historical gradient magnitude.</p>
 </div>
 </div>
@@ -313,10 +314,14 @@ window.Quarto = {
 <div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>For likelihood-based models, curvature can be approximated with squared gradients! Starting from the normalization condition, <span class="math inline">\(\int p(y|x,\theta)\, dy = 1\)</span>, and differentiating twice w.r.t. <span class="math inline">\(\theta\)</span> (using the log-derivative trick <span class="math inline">\(\nabla_\theta p = p\,\nabla_\theta \log p\)</span> at each step) yields: <span class="math inline">\(\mathbb{E}[\nabla_\theta^2 \log p] = - \mathbb{E}\left[(\nabla_\theta \log p)(\nabla_\theta \log p)^\top\right]\)</span>. If the training loss is the negative log-likelihood <span class="math inline">\(\ell = -\log p(y|x,\theta)\)</span>. Thus, <span class="math inline">\(\mathbb{E}[H_\theta] = \mathbb{E}\left[(\nabla_\theta \ell)(\nabla_\theta \ell)^\top\right]\)</span>. Taking the diagonal: <span class="math inline">\(\text{diag}(\mathbb{E}[H_\theta]) = \mathbb{E}[(\nabla_\theta \ell)^2]\)</span>. Thus, the expected squared gradient per parameter provides a practical estimate of the diagonal curvature.</p>
+<p><strong>Intuition</strong></p>
+<p>At first it may seem surprising that curvature (a second-order quantity) can be estimated using gradients (a first-order quantity). The key point is that the relationship holds <em>in expectation over the dataset</em>, rather than at individual datapoints.</p>
+<p>Consider the gradient of the loss with respect to a parameter <span class="math inline">\(\theta_j\)</span> for each training example: <span class="math inline">\(g_{i,j} = \frac{\partial \ell(x_i, y_i)}{\partial \theta_j}\)</span>. If the loss surface is strongly curved along parameter <span class="math inline">\(\theta_j\)</span>, the gradient with respect to that parameter changes rapidly as <span class="math inline">\(\theta_j\)</span> varies, which manifests as large variability in per-sample gradients across the dataset.</p>
+<p>Now, the expected squared gradient can be decomposed as <span class="math inline">\(\mathbb{E}[g_{i,j}^2] = (\mathbb{E}[g_{i,j}])^2 + \mathrm{Var}(g_{i,j})\)</span>, i.e.&nbsp;it captures both the average gradient signal and the variability of gradients across samples. Under the likelihood assumptions above, this second moment corresponds to the expected curvature along that parameter.</p>
 <p><strong>Caveats</strong></p>
 <ol type="1">
 <li>Exact only for negative log-likelihood losses.</li>
-<li>Uses the expected Hessian, not the local Hessian.</li>
+<li>Uses the expected Hessian, not the local Hessian at <span class="math inline">\(\theta_t\)</span>.</li>
 <li>Captures only diagonal curvature.</li>
 </ol>
 </div>
