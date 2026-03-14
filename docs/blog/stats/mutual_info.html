@@ -246,24 +246,104 @@ window.Quarto = {
 <p>Recall that statistical independence means <span class="math inline">\(p(x,y) = p(x)p(y)\)</span>. A natural way to measure the strength of dependence is therefore to compare the true joint distribution <span class="math inline">\(p(x,y)\)</span> with the distribution that would arise under independence <span class="math inline">\(p(x)p(y)\)</span>.</p>
 <p>First, for a particular sample pair <span class="math inline">\((x,y)\)</span>, we consider the ratio <span class="math inline">\(\frac{p(x,y)}{p(x)p(y)}\)</span>, which compares how often <span class="math inline">\((x,y)\)</span> occurs in reality to how often it would occur if the variables were independent. Second, we take the logarithm of this ratio. The quantity <span class="math inline">\(\log \frac{p(x,y)}{p(x)p(y)}\)</span> is sometimes called the pointwise mutual information of the pair <span class="math inline">\((x,y)\)</span>. Finally, we average over all outcomes, weighting each pair <span class="math inline">\((x,y)\)</span> by how frequently it occurs. The resulting quantity is called the <strong>mutual information</strong> between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>:</p>
 <p><span class="math display">\[\boxed{I(X,Y) = \mathbb{E}_{(X,Y)}\!\left[\log \frac{p(x,y)}{p(x)p(y)}\right]}\]</span></p>
-<p>If <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent, then <span class="math inline">\(p(x,y) = p(x)p(y)\)</span> and the ratio equals <span class="math inline">\(1\)</span> everywhere, therefore <span class="math inline">\(I(X,Y) = 0\)</span>. If not, <span class="math inline">\(p(x,y) \neq p(x)p(y)\)</span>, and <span class="math inline">\(I(X,Y) &gt; 0\)</span> (although why <span class="math inline">\(&gt;0\)</span> is not immediately obvious from the definition).</p>
-<p><strong>Units</strong>: The units of mutual information depend on the logarithm base (base <span class="math inline">\(2\)</span> → bits, base <span class="math inline">\(e\)</span> → nats). Using base <span class="math inline">\(2\)</span>, mutual information can be interpreted as the number of bits of uncertainty about one variable that are reduced on average by observing the other.</p>
+<p>If <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent, then <span class="math inline">\(p(x,y) = p(x)p(y)\)</span> and the ratio equals <span class="math inline">\(1\)</span> everywhere, therefore <span class="math inline">\(I(X,Y) = 0\)</span>. If not, <span class="math inline">\(p(x,y) \neq p(x)p(y)\)</span>, and <span class="math inline">\(I(X,Y) &gt; 0\)</span>. This follows from recognising that MI is a KL divergence (see <a href="#appendix">appendix</a>), which is always non-negative.</p>
+<hr>
+<p><strong>Units</strong></p>
+<p>The units of mutual information depend on the logarithm base (base <span class="math inline">\(2\)</span> → bits, base <span class="math inline">\(e\)</span> → nats). Using base <span class="math inline">\(2\)</span>, mutual information can be interpreted as the number of bits of uncertainty about one variable that are reduced on average by observing the other. For discrete variables, this has a concrete meaning: one bit corresponds to the answer to one fair yes/no question, so <span class="math inline">\(I(X,Y) = k\)</span> bits means observing <span class="math inline">\(X\)</span> saves you, on average, <span class="math inline">\(k\)</span> binary questions about <span class="math inline">\(Y\)</span>. For continuous variables, this interpretation breaks down. MI can be unbounded and the absolute value in bits is not directly meaningful. It is better treated as a relative measure, where larger MI indicates stronger dependence.</p>
 </div>
 </div>
 </div>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>4. Challenges in computing mutual information
+<span class="screen-reader-only">Note</span>4. Mutual information as uncertainty reduction
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>The definition above assumes that we know the joint distribution <span class="math inline">\(p(x,y)\)</span> and the marginal distributions <span class="math inline">\(p(x)\)</span> and <span class="math inline">\(p(y)\)</span>. In practice, however, these distributions are rarely known and must be estimated from samples. This becomes particularly challenging in high dimensions. For example, if <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are images with thousands of pixels, the joint distribution <span class="math inline">\(p(x,y)\)</span> lives in a space with thousands of dimensions. Accurately estimating such distributions from finite data quickly becomes infeasible. As a result, practical applications of mutual information typically rely on approximate estimators, lower-dimensional representations, or surrogate objectives.</p>
+<p>Above, we introduced mutual information as a measure of the degree of statistical dependence between two random variables. Here, we present an alternative view: MI measures how much information one variable provides about another, or equivalently, how much uncertainty about one variable is reduced by knowing the other.</p>
+<p><strong>Probability distributions as a measure of uncertainty:</strong> A probability distribution over a random variable encodes our uncertainty about its value. It tells us which outcomes are likely and which are not. A distribution concentrated on a single value means we are near-certain, a spread-out or uniform distribution means we are highly uncertain. <strong>Entropy</strong> <span class="math inline">\(H(Y) = -\mathbb{E}[\log p(Y)]\)</span> quantifies this average uncertainty as a single number: it is large when <span class="math inline">\(p(y)\)</span> is diffuse and small when <span class="math inline">\(p(y)\)</span> is peaked.</p>
+<p><strong>Statistical dependence implies uncertainty reduction:</strong> When <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are statistically dependent, observing <span class="math inline">\(X = x\)</span> shifts the distribution over <span class="math inline">\(Y\)</span> from <span class="math inline">\(p(y)\)</span> to <span class="math inline">\(p(y \mid x)\)</span>, changing how uncertain we are about <span class="math inline">\(Y\)</span>. <strong>Conditional entropy</strong> <span class="math inline">\(H(Y \mid X) = -\mathbb{E}_{(X,Y)}[\log p(y \mid x)]\)</span> captures the remaining uncertainty about <span class="math inline">\(Y\)</span> after observing <span class="math inline">\(X\)</span>, averaged over all possible values of <span class="math inline">\(X\)</span>.</p>
+<p><strong>MI as a measure of uncertainty reduction:</strong> Mutual information is the average reduction in uncertainty about <span class="math inline">\(Y\)</span> due to observing <span class="math inline">\(X\)</span>: <span class="math inline">\(I(X, Y) = H(Y) - H(Y \mid X) = H(X) - H(X \mid Y)\)</span>. Substituting the definitions of MI, entropy, and conditional entropy confirms this identity.</p>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Summary
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Three views of mutual information:</p>
+<ul>
+<li>The <strong>strength of statistical dependence</strong> between two variables</li>
+<li>The <strong>information</strong> one variable provides about the other</li>
+<li>The <strong>reduction in uncertainty</strong> about one variable due to knowing the other</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>5. Challenges in computing mutual information
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The definition above assumes that we know the joint distribution <span class="math inline">\(p(x,y)\)</span> and the marginal distributions <span class="math inline">\(p(x)\)</span> and <span class="math inline">\(p(y)\)</span>. In practice, however, these distributions are rarely known and must be estimated from samples. This becomes particularly challenging in high dimensions. For example, if <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are images with thousands of pixels, the joint distribution <span class="math inline">\(p(x,y)\)</span> lives in a space with thousands of dimensions. Accurately estimating such distributions from finite data quickly becomes infeasible. As a result, practical applications of mutual information typically rely on approximate estimators, lower-dimensional representations, or surrogate objectives. Three main families of approaches are used in practice:</p>
+<p><strong>Non-parametric estimators:</strong> Methods such as the <a href="https://arxiv.org/abs/cond-mat/0305641">KSG estimator</a> compute MI directly from samples using <span class="math inline">\(k\)</span>-nearest-neighbour distances in the joint space, without assuming a parametric form for the distributions. These are accurate in low dimensions but scale poorly as dimensionality grows.</p>
+<p><strong>Variational lower bounds:</strong> Methods such as <a href="https://arxiv.org/abs/1801.04062">MINE</a> and <a href="https://arxiv.org/abs/1807.03748">InfoNCE</a> parameterise a critic network and optimise a tractable lower bound on MI (see <a href="#appendix-variational">appendix</a>). These scale to high-dimensional continuous variables but the bound can be loose, particularly when the true MI is large.</p>
+<p><strong>Proxy objectives:</strong> In many machine learning applications, MI maximisation is replaced with objectives that are easier to optimise and are known empirically to correlate with high MI. Contrastive losses are the most widely used, forming the basis of self-supervised methods such as <a href="https://arxiv.org/abs/2002.05709">SimCLR</a>. These do not produce an estimate of the MI value but are computationally practical at scale.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Appendix: MI as a KL divergence
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The <strong>KL divergence</strong> from distribution <span class="math inline">\(q\)</span> to distribution <span class="math inline">\(p\)</span> is defined as:</p>
+<p><span class="math display">\[D_{\mathrm{KL}}(p \,\|\, q) = \mathbb{E}_{p}\!\left[\log \frac{p(x)}{q(x)}\right]\]</span></p>
+<p>It measures how different <span class="math inline">\(p\)</span> is from <span class="math inline">\(q\)</span>, and satisfies <span class="math inline">\(D_{\mathrm{KL}}(p \,\|\, q) \geq 0\)</span>, with equality if and only if <span class="math inline">\(p = q\)</span>.</p>
+<p>Mutual information is exactly the KL divergence from the product of marginals <span class="math inline">\(p(x)p(y)\)</span> to the joint <span class="math inline">\(p(x,y)\)</span>:</p>
+<p><span class="math display">\[I(X,Y) = \mathbb{E}_{(X,Y)}\!\left[\log \frac{p(x,y)}{p(x)p(y)}\right] = D_{\mathrm{KL}}(p(x,y) \,\|\, p(x)p(y))\]</span></p>
+<p>Non-negativity of KL divergence therefore implies <span class="math inline">\(I(X,Y) \geq 0\)</span>, with equality if and only if <span class="math inline">\(p(x,y) = p(x)p(y)\)</span>, i.e.&nbsp;when <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Appendix: Variational lower bounds on MI
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Because MI cannot be computed directly in high dimensions, a common strategy is to train a critic network <span class="math inline">\(T_\theta(x,y)\)</span> to estimate the log pointwise MI ratio <span class="math inline">\(\log \frac{p(x,y)}{p(x)p(y)}\)</span> at every pair <span class="math inline">\((x,y)\)</span>. Once the critic is accurate, averaging its outputs over samples from the joint gives an estimate of MI. The critic is trained by contrasting positive pairs <span class="math inline">\((x,y) \sim p(x,y)\)</span> (pairs that actually co-occur) against negative pairs <span class="math inline">\((x,y') \sim p(x)p(y)\)</span> (independently sampled, so statistically independent by construction). MINE and InfoNCE differ in the loss used to learn this contrast.</p>
 </div>
 </div>
 </div>
