@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="An intro to the main objects in ML optimization: gradients, Jacobians and Hessians.">
 
-<title>Posts – Neerav Karani</title>
+<title>Machine Learning Optimization Basics – Neerav Karani</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,26 +24,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,63 +69,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-optimization .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-optimization'] = new List('listing-optimization', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-stats .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-stats'] = new List('listing-stats', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -158,17 +100,17 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent quarto-light">
+<body class="nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Neerav Karani</span>
     </a>
   </div>
@@ -179,16 +121,16 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../posts/index.html" aria-current="page"> 
-<span class="menu-text">Posts</span></a>
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -201,15 +143,25 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Posts</h1>
-</div>
+<h1 class="title">Machine Learning Optimization Basics</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Optimization</div>
+  </div>
+  </div>
 
+<div>
+  <div class="description">
+    An intro to the main objects in ML optimization: gradients, Jacobians and Hessians.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -224,51 +176,161 @@ window.Quarto = {
 </header>
 
 
-<div class="posts-listing-page">
-<section id="optimization" class="level2">
-<h2 class="anchored" data-anchor-id="optimization">Optimization</h2>
-<div id="listing-optimization" class="quarto-listing quarto-listing-container-grid">
-<div class="list grid quarto-listing-cols-1">
-<div class="g-col-1" data-index="0" data-categories="T3B0aW1pemF0aW9u" data-listing-file-modified-sort="1773444455659" data-listing-reading-time-sort="5" data-listing-word-count-sort="977">
-<a href="../posts/optimization/optimization_basics.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Machine Learning Optimization Basics
-</h5>
-<div class="card-text listing-description delink">
-<p>An intro to the main objects in ML optimization: gradients, Jacobians and Hessians.</p>
-</div>
-</div>
-</div></a>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div>
-</section>
-<section id="stats" class="level2">
-<h2 class="anchored" data-anchor-id="stats">Stats</h2>
-<div id="listing-stats" class="quarto-listing quarto-listing-container-grid">
-<div class="list grid quarto-listing-cols-1">
-<div class="g-col-1" data-index="0" data-categories="U3RhdGlzdGljcw==" data-listing-file-modified-sort="1773444681170" data-listing-reading-time-sort="3" data-listing-word-count-sort="569">
-<a href="../posts/stats/mutual_info.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Mutual Information
-</h5>
-<div class="card-text listing-description delink">
-<p>Measuring statistical dependence between random variables</p>
-</div>
-</div>
-</div></a>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div>
-</section>
-</div>
+<p>Optimization is at the core of modern machine learning. Training a neural network typically involves minimizing a loss function using gradient-based optimization methods such as stochastic gradient descent or <a href="https://arxiv.org/abs/1412.6980">Adam</a>. In this post, let’s review the basic mathematical objects behind these algorithms: gradients, Jacobians and Hessians.</p>
+<!--
+![](optimization_basics.png)
 
+<p class="img-caption">Generated by <a href="https://chat.figurelabs.ai/chat?agent=3">FigureLabs</a>, prompted by this post.</p>
+-->
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="1. Setup">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Setup
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Consider a model <span class="math inline">\(f_\theta\)</span> trained via supervised learning to classify inputs <span class="math inline">\(x\)</span> into <span class="math inline">\(k\)</span> classes. The model produces logits <span class="math inline">\(z = f_\theta(x) \in \mathbb{R}^k\)</span>, which are converted into predicted class probabilities via the softmax function: <span class="math inline">\(\hat{y} = \sigma(z) \in \mathbb{R}^k\)</span>. The ground-truth label is represented as a one-hot vector <span class="math inline">\(y\)</span>. Training finds parameters that minimize a loss between predicted and ground-truth labels over a dataset: <span class="math inline">\(\theta^* = \arg\min_{\theta} \sum_{n=1}^{N} \ell(y_n, \hat{y}_n)\)</span>.</p>
+<p><strong>Dimensions:</strong></p>
+<ul>
+<li><span class="math inline">\(x \in \mathbb{R}^{d}\)</span></li>
+<li><span class="math inline">\(\theta \in \mathbb{R}^{p}\)</span></li>
+<li><span class="math inline">\(z, \hat{y}, y \in \mathbb{R}^k\)</span></li>
+<li><span class="math inline">\(\ell: \mathbb{R}^k \times \mathbb{R}^k \to \mathbb{R}\)</span></li>
+</ul>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="2. Gradients, Jacobians and Hessians">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Gradients, Jacobians and Hessians
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Solving the optimization requires understanding how the loss and model outputs change as parameters move through <span class="math inline">\(\mathbb{R}^p\)</span>. Three mathematical objects characterize this:</p>
+<ul>
+<li>the <strong>Gradient</strong> <span class="math inline">\(\nabla_\theta \ell \in \mathbb{R}^p\)</span> (first-order change of the (scalar) loss w.r.t. (vector) <span class="math inline">\(\theta\)</span>)</li>
+<li>the <strong>Jacobian</strong> <span class="math inline">\(J_\theta \in \mathbb{R}^{k \times p}\)</span> (first-order change of the (vector) logits w.r.t. (vector) <span class="math inline">\(\theta\)</span>)</li>
+<li>the <strong>Hessian</strong> <span class="math inline">\(H_\theta \in \mathbb{R}^{p \times p}\)</span> (second-order change of the (scalar) loss w.r.t. (vector) <span class="math inline">\(\theta\)</span>)</li>
+</ul>
+<hr>
+<p><strong>Gradient</strong></p>
+<p>The gradient <span class="math inline">\(\nabla_\theta \ell(y, f_\theta(x)) \in \mathbb{R}^p\)</span> measures how the loss changes with each parameter. It points in the direction of steepest increase of the loss. Gradient descent steps in the opposite direction: <span class="math inline">\(\theta_{t+1} = \theta_t - \eta \, \nabla_\theta \ell(y, f_\theta(x))\)</span>, where <span class="math inline">\(\eta\)</span> is the learning rate.</p>
+<hr>
+<p><strong>Jacobian</strong></p>
+<p>The Jacobian <span class="math inline">\(J_\theta = \frac{\partial f_\theta(x)}{\partial \theta} \in \mathbb{R}^{k \times p}\)</span> captures how each output logit <span class="math inline">\(z_i\)</span> changes with each parameter:</p>
+<p><span class="math display">\[J_\theta = \begin{bmatrix} \frac{\partial z_1}{\partial \theta_1} &amp; \cdots &amp; \frac{\partial z_1}{\partial \theta_p} \\ \vdots &amp; \ddots &amp; \vdots \\ \frac{\partial z_k}{\partial \theta_1} &amp; \cdots &amp; \frac{\partial z_k}{\partial \theta_p} \end{bmatrix}\]</span></p>
+<p>Its <span class="math inline">\(i\)</span>-th row is <span class="math inline">\(\frac{\partial z_i}{\partial \theta} \in \mathbb{R}^p\)</span>, describing the sensitivity of class <span class="math inline">\(i\)</span> to all parameters.</p>
+<hr>
+<p><strong>Hessian</strong></p>
+<p>The Hessian <span class="math inline">\(H_\theta = \nabla_\theta^2 \ell \in \mathbb{R}^{p \times p}\)</span> measures the curvature of the loss landscape:</p>
+<p><span class="math display">\[H_\theta = \begin{bmatrix} \frac{\partial^2 \ell}{\partial \theta_1^2} &amp; \cdots &amp; \frac{\partial^2 \ell}{\partial \theta_1 \partial \theta_p} \\ \vdots &amp; \ddots &amp; \vdots \\ \frac{\partial^2 \ell}{\partial \theta_p \partial \theta_1} &amp; \cdots &amp; \frac{\partial^2 \ell}{\partial \theta_p^2} \end{bmatrix}\]</span></p>
+<p>Large eigenvalues of <span class="math inline">\(H_\theta\)</span> indicate sharp curvature, while small eigenvalues indicate flat directions. Computing the full Hessian is usually infeasible for modern networks due to its <span class="math inline">\(p \times p\)</span> size.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="3. Backpropagation as a Vector–Jacobian Product">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Backpropagation as a Vector–Jacobian Product
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Why the Jacobian matters</strong></p>
+<p>The Jacobian <span class="math inline">\(J_\theta\)</span> is crucial in the computation of gradients via the chain rule, and is central to how neural networks are trained.</p>
+<p>Gradient descent requires <span class="math inline">\(\nabla_\theta \ell(y, f_\theta(x)) \in \mathbb{R}^p\)</span>, the gradient of the scalar loss w.r.t. model parameters. By the chain rule, this is a vector-Jacobian product (VJP): <span class="math inline">\(\nabla_\theta \ell = \frac{\partial \ell}{\partial \theta} = \frac{\partial \ell}{\partial z} \frac{\partial z}{\partial \theta} = (\nabla_z \ell)^T J_\theta\)</span> where <span class="math inline">\(\nabla_z \ell \in \mathbb{R}^k\)</span> is the gradient of the loss w.r.t. the logits, and <span class="math inline">\(J_\theta \in \mathbb{R}^{k \times p}\)</span> is the Jacobian of the logits w.r.t. the parameters.</p>
+<hr>
+<p><strong>Computing Gradients efficiently</strong></p>
+<p>Backpropagation computes this VJP efficiently by traversing the computation graph in reverse, accumulating gradients layer by layer without ever materializing <span class="math inline">\(J_\theta\)</span>. This costs <span class="math inline">\(O(p)\)</span> and is achieved in a single backward pass, the same order as the forward pass.</p>
+<p>The naive alternative would be to form <span class="math inline">\(J_\theta\)</span> explicitly row by row and then multiply. This requires <span class="math inline">\(k\)</span> backward passes at <span class="math inline">\(O(kp)\)</span> compute, and storing the full <span class="math inline">\(k \times p\)</span> matrix in memory. For modern networks where <span class="math inline">\(p\)</span> can be in the billions, both the <span class="math inline">\(k\times\)</span> compute overhead and the <span class="math inline">\(k \times p\)</span> memory cost make explicit Jacobian materialization infeasible.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="4. Hessian approximations in practice">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Hessian approximations in practice
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Why the Hessian matters</strong></p>
+<p>Vanilla gradient descent uses the same learning rate for every parameter: <span class="math inline">\(\theta_{t+1} = \theta_t - \eta \, \nabla_\theta \ell\)</span>. However, different directions in parameter space may have very different curvature. Ideally we would account for this using Newton’s method (see <a href="#appendix-a">Appendix A</a>): <span class="math inline">\(\theta_{t+1} = \theta_t - H_\theta^{-1} \nabla_\theta \ell\)</span>. Here the inverse Hessian rescales the gradient: steps are <strong>larger in flat directions</strong> and <strong>smaller in steep ones</strong>. Unfortunately the Hessian <span class="math inline">\(H_\theta \in \mathbb{R}^{p\times p}\)</span> is far too large to compute or invert for modern neural networks.</p>
+<hr>
+<p><strong>Diagonal curvature approximation</strong></p>
+<p>A common simplification is to approximate only the diagonal of the Hessian. This gives a per-parameter learning rate: <span class="math inline">\(\theta_{t+1,i} = \theta_{t,i} - \eta \, \frac{\nabla_{\theta_i}\ell}{\sqrt{h_i}}\)</span>, where <span class="math inline">\(h_i\)</span> estimates the curvature of parameter <span class="math inline">\(i\)</span>. For likelihood-based losses, the diagonal of the expected Hessian can be approximated using squared gradients (see <a href="#appendix-b">Appendix B</a>): <span class="math inline">\(\text{diag}(\mathbb{E}[H_\theta]) \approx \mathbb{E}[(\nabla_\theta \ell)^2]\)</span>. This makes curvature estimation possible using gradients alone!</p>
+<hr>
+<p><strong><a href="https://arxiv.org/abs/1412.6980">Adam</a></strong></p>
+<p>Adam maintains running estimates of the first and second moments of the gradient: <span class="math inline">\(m_t = \beta_1 m_{t-1} + (1-\beta_1)\nabla_\theta \ell\)</span>, <span class="math inline">\(v_t = \beta_2 v_{t-1} + (1-\beta_2)(\nabla_\theta \ell)^2\)</span> and updates parameters as <span class="math inline">\(\theta_{t+1} = \theta_t - \eta \frac{m_t}{\sqrt{v_t}+\epsilon}\)</span>. The denominator <span class="math inline">\(\sqrt{v_t}\)</span> acts as a diagonal curvature estimate, scaling each parameter’s update according to its historical gradient magnitude.</p>
+</div>
+</div>
+</div>
+<hr>
+<div id="appendix-a" class="callout callout-style-default callout-note no-icon callout-titled" title="Appendix A: Newton's method from a Taylor expansion">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Appendix A: Newton’s method from a Taylor expansion
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The motivation for Newton’s update comes from minimizing a local quadratic approximation of the loss. Expanding <span class="math inline">\(\ell(\theta)\)</span> around <span class="math inline">\(\theta_t\)</span> via a second-order Taylor expansion: <span class="math inline">\(\ell(\theta) \approx \ell(\theta_t) + \nabla_\theta \ell^\top (\theta - \theta_t) + \frac{1}{2}(\theta - \theta_t)^\top H_\theta (\theta - \theta_t)\)</span>. Setting the derivative of this quadratic w.r.t. <span class="math inline">\(\theta\)</span> to zero: <span class="math inline">\(\nabla_\theta \ell + H_\theta (\theta - \theta_t) = 0 \implies \theta = \theta_t - H_\theta^{-1} \nabla_\theta \ell\)</span>. Thus, Newton’s update finds the exact minimum of the local quadratic approximation in one step, rather than just following the gradient with a fixed step size.</p>
+</div>
+</div>
+</div>
+<div id="appendix-b" class="callout callout-style-default callout-note no-icon callout-titled" title="Appendix B: Diagonal Hessian Approximation">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Appendix B: Diagonal Hessian Approximation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For likelihood-based models, curvature can be approximated with squared gradients! Starting from the normalization condition, <span class="math inline">\(\int p(y|x,\theta)\, dy = 1\)</span>, and differentiating twice w.r.t. <span class="math inline">\(\theta\)</span> (using the log-derivative trick <span class="math inline">\(\nabla_\theta p = p\,\nabla_\theta \log p\)</span> at each step) yields: <span class="math inline">\(\mathbb{E}[\nabla_\theta^2 \log p] = - \mathbb{E}\left[(\nabla_\theta \log p)(\nabla_\theta \log p)^\top\right]\)</span>. If the training loss is the negative log-likelihood <span class="math inline">\(\ell = -\log p(y|x,\theta)\)</span>. Thus, <span class="math inline">\(\mathbb{E}[H_\theta] = \mathbb{E}\left[(\nabla_\theta \ell)(\nabla_\theta \ell)^\top\right]\)</span>. Taking the diagonal: <span class="math inline">\(\text{diag}(\mathbb{E}[H_\theta]) = \mathbb{E}[(\nabla_\theta \ell)^2]\)</span>. Thus, the expected squared gradient per parameter provides a practical estimate of the diagonal curvature.</p>
+<p><strong>Intuition</strong></p>
+<p>At first it may seem surprising that curvature (a second-order quantity) can be estimated using gradients (a first-order quantity). The key point is that the relationship holds <em>in expectation over the dataset</em>, rather than at individual datapoints.</p>
+<p>Consider the gradient of the loss with respect to a parameter <span class="math inline">\(\theta_j\)</span> for each training example: <span class="math inline">\(g_{i,j} = \frac{\partial \ell(x_i, y_i)}{\partial \theta_j}\)</span>. If the loss surface is strongly curved along parameter <span class="math inline">\(\theta_j\)</span>, the gradient with respect to that parameter changes rapidly as <span class="math inline">\(\theta_j\)</span> varies, which manifests as large variability in per-sample gradients across the dataset.</p>
+<p>Now, the expected squared gradient can be decomposed as <span class="math inline">\(\mathbb{E}[g_{i,j}^2] = (\mathbb{E}[g_{i,j}])^2 + \mathrm{Var}(g_{i,j})\)</span>, i.e.&nbsp;it captures both the average gradient signal and the variability of gradients across samples. Under the likelihood assumptions above, this second moment corresponds to the expected curvature along that parameter.</p>
+<p><strong>Caveats</strong></p>
+<ol type="1">
+<li>Exact only for negative log-likelihood losses.</li>
+<li>Uses the expected Hessian, not the local Hessian at <span class="math inline">\(\theta_t\)</span>.</li>
+<li>Captures only diagonal curvature.</li>
+</ol>
+</div>
+</div>
+</div>
+<hr>
 
 
 
