@@ -1,0 +1,84 @@
+
+---
+title: "Vision Transformers"
+description: "An intro to vision transformers"
+categories: [Modeling]
+---
+
+::: {.callout-note collapse="true" icon="false" title="1. A minimal overview of transformers"}
+At a high level, a transformer processes a sequence of vectors through repeated blocks that alternate between two operations:
+1. information aggregation across tokens
+2. feature transformation within each token
+
+This simple pattern turns out to be extremely powerful.
+
+---
+
+*From tokens to embeddings*
+
+The input first becomes a sequence of vectors.
+For example, in vision: the image is split into patches, and each patch is projected into an embedding vector
+$x_i \in \mathbb{R}^d$
+The model therefore operates on a matrix
+$X = [x_1, x_2, ..., x_n] \in \mathbb{R}^{n \times d}$,
+where: $n$ is number of tokens (patches) and $d$ is the embedding dimension
+
+---
+
+*Transformer blocks*
+
+A transformer repeatedly applies blocks of the form: attention → MLP.
+Conceptually, these perform two complementary operations.
+
+*Attention: aggregating information across tokens*:
+In the attention step, each token gathers information from other tokens.
+$y_i = \sum_j \alpha_{ij} v_j$,
+where the weights are computed from token similarity:
+$\alpha_{ij} =. \text{softmax}\left(\frac{q_i^T k_j}{\sqrt{d}}\right)$.
+This means that each token becomes a **weighted combination of other tokens in the sequence**.
+Importantly, the weights depend on the **content of the tokens themselves**,
+so the aggregation pattern can change for every input.
+
+*MLP: transforming features within each token*:
+After attention mixes information across tokens,
+a feed-forward network transforms each token independently:
+$z_i = W_2 \sigma(W_1 y_i)$.
+This step mixes information **within the feature dimension**, but does not combine tokens.
+
+---
+
+Stacking many such blocks allows information to propagate through the sequence
+while repeatedly transforming the representation.
+Despite this simplicity,
+stacking these operations allows the model to represent complex relationships
+between elements of the sequence.
+
+---
+
+*Residual structure*
+
+In practice, each block is wrapped with residual connections and normalization:
+$X' = X + \text{Attention}(\text{LN}(X))$,
+$X'' = X' + \text{MLP}(\text{LN}(X'))$
+This structure stabilizes training and allows many blocks to be stacked.
+
+
+<!--
+NOTES
+While vision transformers were initially motivated by their ability to model long-range interactions,
+their real advantage comes from flexible, content-dependent feature aggregation
+and better scaling with data and model size.
+
+CNN - ViT convergence
+
+Modern CNNs (ConvNeXt, large kernel CNNs) have started moving toward more flexible aggregation:
+	•	larger kernels
+	•	dynamic convolutions
+	•	attention-like modules
+
+Meanwhile transformers are adding:
+	•	locality bias
+	•	hierarchical structure
+
+Both paradigms are slowly converging
+-->

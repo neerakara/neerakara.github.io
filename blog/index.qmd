@@ -2,6 +2,13 @@
 title: Posts
 toc: false
 listing:
+  - id: modeling
+    contents: "modeling/*.qmd"
+    type: grid
+    grid-columns: 1
+    fields: [title, description]
+    filter-ui: false
+    sort-ui: false
   - id: optimization
     contents: "optimization/*.qmd"
     type: grid
@@ -19,6 +26,11 @@ listing:
 ---
 
 <div class="posts-listing-page">
+
+## Modeling
+
+::: {#modeling}
+:::
 
 ## Optimization
 
