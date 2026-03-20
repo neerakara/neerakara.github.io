@@ -247,9 +247,6 @@ window.Quarto = {
 <p>First, for a particular sample pair <span class="math inline">\((x,y)\)</span>, we consider the ratio <span class="math inline">\(\frac{p(x,y)}{p(x)p(y)}\)</span>, which compares how often <span class="math inline">\((x,y)\)</span> occurs in reality to how often it would occur if the variables were independent. Second, we take the logarithm of this ratio. The quantity <span class="math inline">\(\log \frac{p(x,y)}{p(x)p(y)}\)</span> is sometimes called the pointwise mutual information of the pair <span class="math inline">\((x,y)\)</span>. Finally, we average over all outcomes, weighting each pair <span class="math inline">\((x,y)\)</span> by how frequently it occurs. The resulting quantity is called the <strong>mutual information</strong> between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>:</p>
 <p><span class="math display">\[\boxed{I(X,Y) = \mathbb{E}_{(X,Y)}\!\left[\log \frac{p(x,y)}{p(x)p(y)}\right]}\]</span></p>
 <p>If <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent, then <span class="math inline">\(p(x,y) = p(x)p(y)\)</span> and the ratio equals <span class="math inline">\(1\)</span> everywhere, therefore <span class="math inline">\(I(X,Y) = 0\)</span>. If not, <span class="math inline">\(p(x,y) \neq p(x)p(y)\)</span>, and <span class="math inline">\(I(X,Y) &gt; 0\)</span>. This follows from recognising that MI is a KL divergence (see <a href="#appendix">appendix</a>), which is always non-negative.</p>
-<hr>
-<p><strong>Units</strong></p>
-<p>The units of mutual information depend on the logarithm base (base <span class="math inline">\(2\)</span> → bits, base <span class="math inline">\(e\)</span> → nats). Using base <span class="math inline">\(2\)</span>, mutual information can be interpreted as the number of bits of uncertainty about one variable that are reduced on average by observing the other. For discrete variables, this has a concrete meaning: one bit corresponds to the answer to one fair yes/no question, so <span class="math inline">\(I(X,Y) = k\)</span> bits means observing <span class="math inline">\(X\)</span> saves you, on average, <span class="math inline">\(k\)</span> binary questions about <span class="math inline">\(Y\)</span>. For continuous variables, this interpretation breaks down. MI can be unbounded and the absolute value in bits is not directly meaningful. It is better treated as a relative measure, where larger MI indicates stronger dependence.</p>
 </div>
 </div>
 </div>
@@ -288,6 +285,9 @@ window.Quarto = {
 </ul>
 </div>
 </div>
+<hr>
+<p><strong>Units</strong></p>
+<p>The units of mutual information depend on the logarithm base (base <span class="math inline">\(2\)</span> → bits, base <span class="math inline">\(e\)</span> → nats). Using base <span class="math inline">\(2\)</span>, mutual information can be interpreted as the number of bits of uncertainty about one variable that are reduced on average by observing the other. For discrete variables, this has a concrete meaning: one bit corresponds to the answer to one fair yes/no question, so <span class="math inline">\(I(X,Y) = k\)</span> bits means observing <span class="math inline">\(X\)</span> saves you, on average, <span class="math inline">\(k\)</span> binary questions about <span class="math inline">\(Y\)</span>. For continuous variables, this interpretation breaks down. MI can be unbounded and the absolute value in bits is not directly meaningful. It is better treated as a relative measure, where larger MI indicates stronger dependence.</p>
 </div>
 </div>
 </div>
