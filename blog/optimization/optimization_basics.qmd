@@ -5,8 +5,8 @@ categories: [Optimization]
 ---
 
 Optimization is at the core of modern machine learning.
-Training a neural network typically involves minimizing a loss function using gradient-based optimization methods such as stochastic gradient descent or [Adam](https://arxiv.org/abs/1412.6980).
-In this post, let's review the basic mathematical objects behind these algorithms: gradients, Jacobians and Hessians.
+Training a neural network typically involves minimizing a loss function using gradient-based optimization.
+This post reviews the basic mathematical objects behind these algorithms: gradients, Jacobians and Hessians.
 
 <!--
 ![](optimization_basics.png)

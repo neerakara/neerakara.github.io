@@ -65,19 +65,6 @@ $$\boxed{I(X,Y) = \mathbb{E}_{(X,Y)}\!\left[\log \frac{p(x,y)}{p(x)p(y)}\right]}
 If $X$ and $Y$ are independent, then $p(x,y) = p(x)p(y)$ and the ratio equals $1$ everywhere, therefore $I(X,Y) = 0$.
 If not, $p(x,y) \neq p(x)p(y)$, and $I(X,Y) > 0$. This follows from recognising that MI is a KL divergence (see [appendix](#appendix)), which is always non-negative.
 
----
-
-**Units**
-
-The units of mutual information depend on the logarithm base (base $2$ → bits, base $e$ → nats).
-Using base $2$, mutual information can be interpreted as the number of bits of uncertainty
-about one variable that are reduced on average by observing the other.
-For discrete variables, this has a concrete meaning:
-one bit corresponds to the answer to one fair yes/no question,
-so $I(X,Y) = k$ bits means observing $X$ saves you, on average, $k$ binary questions about $Y$.
-For continuous variables, this interpretation breaks down.
-MI can be unbounded and the absolute value in bits is not directly meaningful.
-It is better treated as a relative measure, where larger MI indicates stronger dependence.
 :::
 
 ::: {.callout-note collapse="true" icon="false"}
@@ -118,6 +105,20 @@ Three views of mutual information:
 - The **information** one variable provides about the other
 - The **reduction in uncertainty** about one variable due to knowing the other
 :::
+
+---
+
+**Units**
+
+The units of mutual information depend on the logarithm base (base $2$ → bits, base $e$ → nats).
+Using base $2$, mutual information can be interpreted as the number of bits of uncertainty
+about one variable that are reduced on average by observing the other.
+For discrete variables, this has a concrete meaning:
+one bit corresponds to the answer to one fair yes/no question,
+so $I(X,Y) = k$ bits means observing $X$ saves you, on average, $k$ binary questions about $Y$.
+For continuous variables, this interpretation breaks down.
+MI can be unbounded and the absolute value in bits is not directly meaningful.
+It is better treated as a relative measure, where larger MI indicates stronger dependence.
 
 :::
 
