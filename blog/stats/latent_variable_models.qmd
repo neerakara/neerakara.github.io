@@ -1,0 +1,187 @@
+---
+title: "Latent Variable Models"
+description: "A Structured Way to Think About Data"
+categories: [Statistics]
+---
+
+::: {.callout-note collapse="true" icon="false"}
+## 1. Unsupervised data modeling
+Suppose we have access to unlabelled data observations $x_1, x_2, \dots, x_n$ drawn from some unknown distribution $p(x)$.
+The goal of unsupervised data modeling is to characterize this distribution via a model $p_\theta(x)$.
+Doing so provides a unified way to reason about the data, with several practical applications such as
+density estimation, anomaly detection, sampling, unsupervised clustering, representation learning, missing data imputation, etc.
+
+Models that learn $p_\theta(x)$ (or more generally $p_\theta(x, \cdot)$) are often referred to as **generative models**, a misleading terminology, in my opinion.
+The term “generative” does not primarily refer to the ability to generate samples.
+Rather, it reflects the fact that these models specify a **probabilistic process by which the observed data could have been generated**.
+:::
+
+::: {.callout-note collapse="true" icon="false"}
+## 2. Learning and Inference
+
+Once we posit a probabilistic model for the data, we are interested in two fundamental tasks: learning and inference. 
+
+- **Learning**: how do we fit the model to observed data, i.e. how to we estimate parameters $\theta$.
+Given observations $x_1, \dots, x_n$, this is often formulated as maximizing the likelihood:
+$\max_\theta \sum_{i=1}^n \log p_\theta(x_i)$, so that the model assigns high probability to the observed data.
+- **Inference**: how do we use the learned model? This amounts to querying the learned model in different ways:
+    - **Evaluating likelihoods**: assessing how likely new observations are under the model, which can be used for tasks such as anomaly detection or model comparison  
+    - **Sampling**: generating new observations $x \sim p_\theta(x)$  
+    - **Representation learning**: extracting useful features that capture the underlying structure of the data  
+    - **Missing data imputation**: predicting unobserved or corrupted parts of a datapoint given the observed parts  
+:::
+
+::: {.callout-note collapse="true" icon="false"}
+## 3. The difficulty of modeling $p(x)$ directly
+
+Let's consider what happens if we to naively choose a family of distributions and fit it directly to the data.
+
+**Modeling images with a Gaussian distribution**:
+
+Consider the simplest case: modeling images with a single Gaussian,
+$p(x) = \mathcal{N}(x \mid \mu, \Sigma)$.
+
+Learning the parameters of this model is straightforward.
+The mean $\mu$ becomes the average image, and the covariance $\Sigma$ captures correlations between pixels.
+However, this quickly reveals a limitation:
+$\mu$ is typically a blurry image that does not resemble any valid example,
+and $\Sigma$ mostly reflects low-level statistics rather than meaningful structure.
+
+The issue is not just that a Gaussian is too simple, it is that it assumes all data can be explained as variations around a single prototype.
+Even a simple dataset, such as handwritten digits, contains multiple distinct modes corresponding to different digits, styles, and shapes.
+
+**Modeling images with a Mixture of Gaussians distribution**:
+
+A natural extension is to use a mixture of Gaussians:
+$p(x) = \sum_{k=1}^K \pi_k \, \mathcal{N}(x \mid \mu_k, \Sigma_k)$,
+where each component models a different subset of the data.
+
+This improves the situation.
+The model can now represent multiple modes, and each component captures a more meaningful local pattern.
+However, this still does not fully address the problem.
+Each observation is explained by a **single component**, which implicitly assumes that all variation in that datapoint can be attributed to one underlying cause.
+
+In practice, data is rarely generated this way.
+Consider an image: it may depend simultaneously on several independent factors such as object identity, pose, lighting, and texture.
+A mixture model cannot represent this compositional structure.
+Instead, it must allocate a separate component for every combination of these factors.
+As the number of factors grows, the number of required components grows rapidly, making the model inefficient and hard to scale.
+
+**Consequences of modeling in pixel-space**:
+
+The underlying difficulty is that we are trying to model $p(x)$ without explicitly representing the factors that give rise to the data.
+All structure must be encoded implicitly in the parameters of the distribution.
+As a result, simple variations become hard to express, independent factors become entangled, and the model must use increasingly complex parameterizations to compensate.
+
+:::
+
+::: {.callout-note collapse="true" icon="false"}
+## 3. Tmp
+
+For example, a model might describe data as arising from hidden variables $z$, first sampled from $p(z)$ and then used to generate observations via $p(x \mid z)$. Sampling from the model is simply one consequence of having specified this process. More fundamentally, such models provide a way to explain, analyze, and reason about the data in terms of underlying structure.
+
+Suppose we are given observations $x_1, x_2, \dots, x_n$ drawn from some unknown distribution, $p(x)$.
+Characterizing this distribution provides a unified way to reason about the data.
+For instance, it enables us to evaluate the likelihood of new observations (density estimation), generate samples (generative modeling), and uncover the structure present in the dataset (representation learning).
+
+In principle, we could attempt to model $p(x)$ directly.
+But for many datasets, this distribution is highly complex:
+it may be multimodal, vary along multiple underlying factors, and exhibit structure that is not easily expressed in the raw observation space.
+
+Directly modeling $p(x)$ forces us to capture all sources of variation at once (i.e. without explicitly disentangling them):
+- low-level variability (e.g. noise, small perturbations),
+- and high-level structure (e.g. object identity, semantic content).
+
+These are often entangled in the observation space.
+As a result, even simple patterns can require complicated models when expressed directly in terms of $x$.
+
+One way to address this is to introduce additional variables $z$ that are not observed,
+but help explain how the data is generated.
+These are called latent variables.
+
+Instead of modeling $p(x)$ directly, we define a joint model:
+p(x, z) = p(x \mid z)p(z),
+where:
+$z \sim p(z)$ represents a hidden cause,
+$x \sim p(x \mid z)$ is generated conditioned on that cause.
+
+The distribution over observed data is then obtained by marginalizing over $z$:
+p(x) = \sum_z p(x \mid z)p(z),
+or, for continuous latent variables,
+p(x) = \int p(x \mid z)p(z)\, dz.
+
+This simple construction allows us to express a complex distribution over $x$ as a combination of simpler conditional models.
+
+:::
+
+::: {.callout-note collapse="true" icon="false"}
+## 2. Two concrete examples
+
+**Gaussian mixture model (discrete $z$)**
+
+Suppose 2D data has two clusters.
+A single Gaussian is too rigid; a mixture of components works:
+
+$$p(x) = \sum_{k=1}^{2} \pi_k\,\mathcal{N}(x \mid \mu_k, \Sigma_k), \quad z \in \{1, 2\}.$$
+
+```text
+x2
+^            o o o
+|          o o o
+|   x x x
+|    x x x
++----------------------> x1
+   z=1             z=2
+```
+
+Each point first picks a hidden component $z$, then is sampled from that component.
+The discrete latent variable identifies which cluster explains the observation.
+
+---
+
+**Factor model (continuous $z$)**
+
+For high-dimensional observations, a low-dimensional continuous factor generates data:
+
+$$x = Wz + \epsilon, \quad z \sim \mathcal{N}(0, I), \quad \epsilon \sim \mathcal{N}(0, \Psi).$$
+
+```text
+z (low-dim)  -->  W  -->  x (high-dim)
+      *                   cloud near a low-dim subspace
+```
+
+Each sample is built by combining a few latent factors through $W$, plus noise.
+The continuous latent variables capture the underlying modes of variation.
+:::
+
+::: {.callout-note collapse="true" icon="false"}
+## 3. The core challenge: learning and inference
+
+Once we introduce latent variables, two fundamental problems arise.
+
+**Learning:** estimating the parameters of $p(z)$ and $p(x \mid z)$ from data.
+
+**Inference:** for a given $x$, determining which values of $z$ are likely to have generated it, i.e. computing the posterior $p(z \mid x)$.
+
+These problems are tightly coupled: good parameter estimates require knowing the latent variables, and accurately inferring the latent variables requires good parameters.
+The latent variables are never observed, so both learning and inference require us to reason about unknown quantities.
+:::
+
+::: {.callout-note collapse="true" icon="false"}
+## 4. The computational bottleneck
+
+Computing the likelihood requires marginalizing out the latent variables:
+
+$$p(x) = \sum_z p(x, z).$$
+
+This marginalization is often **intractable** — there is no closed-form solution and the sum can have exponentially many terms.
+This is the central computational difficulty in latent variable models.
+
+Classical and modern approaches address this challenge:
+
+- **Expectation Maximization (EM):** alternates between inferring latent variables and updating parameters.
+- **Variational inference:** approximates the intractable posterior $p(z \mid x)$ with a tractable one.
+- **Variational autoencoders (VAEs):** combine variational inference with neural networks to learn flexible latent representations.
+
+Each method trades computational tractability for approximation error, but together they have made latent variable modeling a cornerstone of modern machine learning.
+:::

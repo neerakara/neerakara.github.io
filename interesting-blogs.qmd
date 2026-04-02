@@ -1,0 +1,12 @@
+---
+title: Interesting Blogs
+toc: false
+---
+
+A running list of blogs and websites I enjoy reading.
+
+## Current Favorites
+
+- <https://mbernste.github.io/>
+- <https://freeenergy.blog>
+- <https://sander.ai>

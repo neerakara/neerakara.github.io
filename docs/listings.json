@@ -3,6 +3,7 @@
     "listing": "/blog/index.html",
     "items": [
       "/blog/optimization/optimization_basics.html",
+      "/blog/stats/latent_variable_models.html",
       "/blog/stats/mutual_info.html"
     ]
   }
