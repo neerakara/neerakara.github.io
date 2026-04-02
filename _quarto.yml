@@ -12,8 +12,6 @@ website:
         text: About
       - href: blog/index.qmd
         text: Blog
-      - href: interesting-blogs.qmd
-        text: Interesting Blogs
 
 format:
   html:

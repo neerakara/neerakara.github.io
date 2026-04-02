@@ -20,14 +20,19 @@ listing:
 
 <div class="posts-listing-page">
 
+## Stats
+
+::: {#stats}
+:::
+
 ## Optimization
 
 ::: {#optimization}
 :::
 
-## Stats
 
-::: {#stats}
-:::
+## Misc
+
+- [Interesting Blogs](../interesting-blogs.qmd)
 
 </div>

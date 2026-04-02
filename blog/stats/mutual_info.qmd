@@ -28,6 +28,8 @@ this implies that the joint distribution factorizes as the product of marginals:
 :::
 :::::
 
+---
+
 ::: {.callout-note collapse="true" icon="false"}
 ## 2. Statistical dependence quantification - motivation
 
@@ -45,6 +47,8 @@ Here, $X$ and $Y$ are different measurements of the same latent source $Z$ (e.g.
 A common goal here is to learn representations $Z_X = f_\theta(X), Z_Y = g_\phi(Y)$
 such that the statistical dependence between $Z_X$ and $Z_Y$ is maximized.
 :::
+
+---
 
 ::: {.callout-note collapse="true" icon="false"}
 ## 3. Statistical dependence quantification via mutual information
@@ -66,6 +70,8 @@ If $X$ and $Y$ are independent, then $p(x,y) = p(x)p(y)$ and the ratio equals $1
 If not, $p(x,y) \neq p(x)p(y)$, and $I(X,Y) > 0$. This follows from recognising that MI is a KL divergence (see [appendix](#appendix)), which is always non-negative.
 
 :::
+
+---
 
 ::: {.callout-note collapse="true" icon="false"}
 ## 4. Mutual information as uncertainty reduction
@@ -122,6 +128,8 @@ It is better treated as a relative measure, where larger MI indicates stronger d
 
 :::
 
+---
+
 ::: {.callout-note collapse="true" icon="false"}
 ## 5. Challenges in computing mutual information
 
@@ -157,6 +165,8 @@ forming the basis of self-supervised methods such as [SimCLR](https://arxiv.org/
 These do not produce an estimate of the MI value but are computationally practical at scale.
 :::
 
+---
+
 ::: {.callout-note collapse="true" icon="false"}
 ## Appendix: MI as a KL divergence {#appendix}
 
@@ -190,3 +200,4 @@ negative pairs $(x,y') \sim p(x)p(y)$ (independently sampled, so statistically i
 MINE and InfoNCE differ in the loss used to learn this contrast.
 
 :::
+---

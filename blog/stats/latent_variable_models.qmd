@@ -16,6 +16,8 @@ The term “generative” does not primarily refer to the ability to generate sa
 Rather, it reflects the fact that these models specify a **probabilistic process by which the observed data could have been generated**.
 :::
 
+---
+
 ::: {.callout-note collapse="true" icon="false"}
 ## 2. Learning and Inference
 
@@ -30,6 +32,8 @@ $\max_\theta \sum_{i=1}^n \log p_\theta(x_i)$, so that the model assigns high pr
     - **Representation learning**: extracting useful features that capture the underlying structure of the data  
     - **Missing data imputation**: predicting unobserved or corrupted parts of a datapoint given the observed parts  
 :::
+
+---
 
 ::: {.callout-note collapse="true" icon="false"}
 ## 3. The difficulty of modeling $p(x)$ directly
@@ -75,6 +79,8 @@ As a result, simple variations become hard to express, independent factors becom
 
 :::
 
+---
+
 ::: {.callout-note collapse="true" icon="false"}
 ## 3. Tmp
 
@@ -113,6 +119,8 @@ p(x) = \int p(x \mid z)p(z)\, dz.
 This simple construction allows us to express a complex distribution over $x$ as a combination of simpler conditional models.
 
 :::
+
+---
 
 ::: {.callout-note collapse="true" icon="false"}
 ## 2. Two concrete examples
@@ -154,6 +162,8 @@ Each sample is built by combining a few latent factors through $W$, plus noise.
 The continuous latent variables capture the underlying modes of variation.
 :::
 
+---
+
 ::: {.callout-note collapse="true" icon="false"}
 ## 3. The core challenge: learning and inference
 
@@ -166,6 +176,8 @@ Once we introduce latent variables, two fundamental problems arise.
 These problems are tightly coupled: good parameter estimates require knowing the latent variables, and accurately inferring the latent variables requires good parameters.
 The latent variables are never observed, so both learning and inference require us to reason about unknown quantities.
 :::
+
+---
 
 ::: {.callout-note collapse="true" icon="false"}
 ## 4. The computational bottleneck
@@ -185,3 +197,5 @@ Classical and modern approaches address this challenge:
 
 Each method trades computational tractability for approximation error, but together they have made latent variable modeling a cornerstone of modern machine learning.
 :::
+
+---
