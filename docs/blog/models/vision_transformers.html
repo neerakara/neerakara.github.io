@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="An introduction to Vision Transformers (ViTs): patch embeddings, self-attention and transformer blocks.">
+<meta name="description" content="A practical introduction to Vision Transformers (ViTs): patch embeddings, positional encodings, self-attention, and transformer blocks.">
 
 <title>Intro to Vision Transformers – Neerav Karani</title>
 <style>
@@ -159,7 +159,7 @@ window.Quarto = {
 
 <div>
   <div class="description">
-    An introduction to Vision Transformers (ViTs): patch embeddings, self-attention and transformer blocks.
+    A practical introduction to Vision Transformers (ViTs): patch embeddings, positional encodings, self-attention, and transformer blocks.
   </div>
 </div>
 
@@ -176,9 +176,21 @@ window.Quarto = {
 </header>
 
 
-<p><a href="https://arxiv.org/abs/2010.11929">Vision Transformers</a> (ViTs) adapt the transformer architecture from natural language processing to images. Instead of processing pixels through convolutional filters, ViTs represent an image as a sequence of patch tokens and apply self-attention across them. This allows every image region to directly interact with every other region at every layer.</p>
-<p>This post introduces the basic structure of a vanilla Vision Transformer: patch embeddings, positional encodings, multi-head self-attention and transformer blocks.</p>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="1. Patch Embeddings">
+<p><a href="https://arxiv.org/abs/2010.11929">Vision Transformers</a> (ViTs) adapt the transformer architecture from natural language processing to images. Instead of using convolutional filters over local neighborhoods, ViTs split an image into patches, represent each patch as a token, and apply self-attention over the full token sequence. This allows information to flow directly between distant image regions at every layer.</p>
+<p>This post starts with the core ViT architecture, then moves through training and adaptation (self-supervised pretraining and LoRA), practical deployment constraints (scaling and memory), and downstream extensions for dense prediction, with a final appendix on positional embedding variants.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="1. Architecture">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Architecture
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Patch Embeddings">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
@@ -205,12 +217,12 @@ X_0
 =
 \tilde X_{\text{patch}} + E_{\text{pos}},
 \]</span></p>
-<p>The positional embeddings encode spatial information about patch locations. In the original ViT formulation, these embeddings are simply initialized randomly and learned through gradient descent.</p>
+<p>The positional embeddings encode spatial information about patch locations. In the original ViT formulation, these embeddings are simply initialized randomly and learned through gradient descent (see <a href="#pos-embeddings">Appendix A</a> for variants).</p>
 </div>
 </div>
 </div>
 <hr>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="2. Self-Attention">
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Self-Attention">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
@@ -240,7 +252,7 @@ X_0 \rightarrow X_1 \rightarrow \cdots \rightarrow X_L,
 </div>
 </div>
 <hr>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="3. Multi-Head Attention">
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Multi-Head Attention">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
@@ -265,7 +277,7 @@ X_0 \rightarrow X_1 \rightarrow \cdots \rightarrow X_L,
 </div>
 </div>
 <hr>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="4. Transformer Blocks">
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Transformer Blocks">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
@@ -296,9 +308,65 @@ Y_\ell + \mathrm{MLP}(\mathrm{LN}(Y_\ell)).
 </div>
 </div>
 </div>
+</div>
+</div>
+</div>
 <hr>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="5. Low-Rank Adaptation (LoRA)">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="2. Self-Supervised Pre-training and Parameter Efficient Fine-Tuning">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Self-Supervised Pre-training and Parameter Efficient Fine-Tuning
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Modern Vision Transformers are typically pretrained at massive scale using self-supervised learning (SSL) methods such as <a href="https://arxiv.org/abs/2104.14294">DINO</a>, <a href="https://arxiv.org/abs/2111.06377">MAE</a>, or CLIP-style contrastive learning. Rather than learning from manually annotated labels, these approaches train models to produce consistent semantic representations across multiple augmented views of the same image.</p>
+<p>Large-scale SSL pre-training substantially improves representation quality and transfer performance across downstream tasks. However, these pretrained ViTs often contain hundreds of millions of parameters, making full fine-tuning computationally expensive.</p>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Parameter Counts">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Parameter Counts
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>To understand the scale of modern Vision Transformers, consider a transformer block with embedding dimension <span class="math inline">\(h\)</span>. For example, DINOv3-Large uses <span class="math inline">\(h = 1024\)</span>.</p>
+<p>The attention projection matrices in each transformer block are <span class="math inline">\(W_Q,W_K,W_V,W_O \in \mathbb{R}^{h\times h}\)</span>. Each therefore contains <span class="math inline">\(h^2\)</span> parameters.</p>
+<p>For DINOv3-Large:</p>
+<p><span class="math display">\[
+h^2 = 1024^2 \approx 1\text{M}
+\]</span></p>
+<p>parameters per matrix.</p>
+<p>Since multi-head attention contains four such matrices, the total attention parameter count per transformer block is</p>
+<p><span class="math display">\[
+4h^2 \approx 4\text{M}.
+\]</span></p>
+<p>The feedforward MLP typically uses <span class="math inline">\(h \rightarrow 4h \rightarrow h\)</span>, giving parameter count</p>
+<p><span class="math display">\[
+h(4h) + (4h)h = 8h^2 \approx 8\text{M}.
+\]</span></p>
+<p>DINOv3-Large contains 24 transformer blocks, yielding approximately</p>
+<p><span class="math display">\[
+24 \times 12\text{M}
+\approx
+288\text{M}
+\]</span></p>
+<p>parameters in the transformer stack alone.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Low-Rank Adaptation (LoRA)">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -307,7 +375,7 @@ Y_\ell + \mathrm{MLP}(\mathrm{LN}(Y_\ell)).
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Large Vision Transformers are often adapted to downstream tasks using Low-Rank Adaptation (LoRA).</p>
 <p>Suppose a pretrained projection matrix is <span class="math inline">\(W \in \mathbb{R}^{h\times h}\)</span>. Rather than updating the full matrix during fine-tuning, LoRA freezes <span class="math inline">\(W\)</span> and learns a low-rank update:</p>
@@ -323,27 +391,293 @@ B \in \mathbb{R}^{h\times r},
 <p>with rank <span class="math inline">\(r \ll h\)</span>.</p>
 <p>The low-rank update therefore contains only <span class="math inline">\(2hr\)</span> learnable parameters rather than the full <span class="math inline">\(h^2\)</span>.</p>
 <p>LoRA is commonly applied to the attention projection matrices <span class="math inline">\(W_Q\)</span>, <span class="math inline">\(W_K\)</span>, <span class="math inline">\(W_V\)</span>, and <span class="math inline">\(W_O\)</span>, though many implementations adapt only a subset of these.</p>
-<p>One interpretation is that downstream tasks often require only small coordinated shifts in representation geometry. Empirically, these low-rank updates are frequently sufficient to adapt large pretrained transformers while dramatically reducing memory and training cost.</p>
+<p>Suppose LoRA uses rank <span class="math inline">\(r=8\)</span> and adapts all four attention projection matrices in each transformer block. For a single matrix, LoRA learns</p>
+<p><span class="math display">\[
+2hr = 2(1024)(8) \approx 16\text{k}
+\]</span></p>
+<p>trainable parameters instead of</p>
+<p><span class="math display">\[
+h^2 \approx 1\text{M}.
+\]</span></p>
+<p>Applying LoRA to all four attention projections across all 24 transformer blocks therefore introduces approximately</p>
+<p><span class="math display">\[
+24 \times 4 \times 16\text{k}
+\approx
+1.6\text{M}
+\]</span></p>
+<p>trainable parameters total.</p>
+<p>Thus, LoRA updates only approximately</p>
+<p><span class="math display">\[
+\frac{1.6}{288}
+\approx
+0.56\%
+\]</span></p>
+<p>of the model parameters.</p>
+<p>This large reduction in trainable parameters substantially lowers memory usage and optimization cost during fine-tuning while often preserving strong downstream performance.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <hr>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="6. Parameter Counts in ViTs and LoRA">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="3. Scaling and Practical Constraints">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Parameter Counts in ViTs and LoRA
+<span class="screen-reader-only">Note</span>Scaling and Practical Constraints
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>To understand the scale of modern Vision Transformers, consider a transformer block with embedding dimension <span class="math inline">\(h\)</span>. For example, DINOv3-Large uses <span class="math inline">\(h = 1024\)</span>. The attention projection matrices in each transformer block are <span class="math inline">\(W_Q,W_K,W_V,W_O \in \mathbb{R}^{h\times h}\)</span>. Each contains <span class="math inline">\(h^2\)</span> parameters.</p>
-<p>For DINOv3-Large: <span class="math inline">\(h^2 = 1024^2 \approx 1\text{M}\)</span> parameters per matrix. Since multi-head attention contains four such matrices, the total attention parameter count per transformer block is <span class="math inline">\(4h^2 \approx 4\text{M}\)</span>. The feedforward MLP typically uses <span class="math inline">\(h \rightarrow 4h \rightarrow h\)</span>, giving parameter count <span class="math inline">\(h(4h) + (4h)h = 8h^2 \approx 8\text{M}\)</span>. DINOv3-large has 24 transformer blocks, thus total parameter count <span class="math inline">\(24*8\text{M} \approx 288\text{M}\)</span>.</p>
-<p>In practice, LoRA updates only a tiny fraction of these parameters. Suppose LoRA uses rank <span class="math inline">\(r=8\)</span> and adapts the four attention projection matrices <span class="math inline">\(W_Q,W_K,W_V,W_O\)</span> in each transformer block. For a single matrix, LoRA learns <span class="math inline">\(A \in \mathbb{R}^{r\times h}, B \in \mathbb{R}^{h\times r}\)</span>, giving <span class="math inline">\(2hr = 2(1024)(8) \approx 16\text{k}\)</span> trainable parameters instead of <span class="math inline">\(h^2 \approx 1\text{M}\)</span>. Applying LoRA to all four attention projections across all 24 transformer blocks corresponds to approximately <span class="math inline">\(24 * 4 * 16\text{k} \approx 1.6\text{M}\)</span>.</p>
-<p>Thus, LoRA updates only approximately <span class="math inline">\(\frac{1.6}{288} \approx 0.56\%\)</span> of the model parameters. This large reduction in trainable parameters substantially lowers memory usage and optimization cost during fine-tuning while often preserving strong downstream performance.</p>
+<p>Self-attention scales quadratically with the number of tokens, imposing practical constraints on resolution and computational cost. LoRA reduces the number of trainable parameters during fine-tuning, but the dominant memory cost during training often comes from activations rather than weights.</p>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Attention Complexity">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Attention Complexity
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For an image of size <span class="math inline">\(H \times W\)</span> with patch size <span class="math inline">\(P\)</span>, the number of patch tokens is</p>
+<p><span class="math display">\[
+N = \frac{H}{P}\frac{W}{P}.
+\]</span></p>
+<p>Self-attention computes pairwise interactions between all tokens, producing an attention matrix of size</p>
+<p><span class="math display">\[
+QK^\top \in \mathbb{R}^{(N+1)\times(N+1)}.
+\]</span></p>
+<p>As a result, attention complexity scales approximately quadratically with token count:</p>
+<p><span class="math display">\[
+\mathcal{O}(N^2 h).
+\]</span></p>
+<p>This scaling behavior explains why Vision Transformers typically use relatively large patch sizes such as <span class="math inline">\(P=16\)</span>. Reducing patch size increases spatial resolution but also dramatically increases attention cost.</p>
+<p>For example, a <span class="math inline">\(224 \times 224\)</span> image with patch size <span class="math inline">\(16\)</span> produces</p>
+<p><span class="math display">\[
+14 \times 14 = 196
+\]</span></p>
+<p>patch tokens.</p>
+<p>Increasing resolution to <span class="math inline">\(512 \times 512\)</span> yields</p>
+<p><span class="math display">\[
+32 \times 32 = 1024
+\]</span></p>
+<p>tokens, increasing attention cost by approximately</p>
+<p><span class="math display">\[
+\left(\frac{1024}{196}\right)^2 \approx 27\times.
+\]</span></p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Practical Strategies for 3D Inputs">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Practical Strategies for 3D Inputs
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>These scaling constraints become particularly important in medical imaging. A typical 3D MRI or CT volume may contain hundreds of slices, making fully 3D transformers computationally expensive.</p>
+<p>One common practical strategy is to apply a pretrained 2D Vision Transformer independently to individual slices or views. The resulting slice-level representations can then be fused using temporal pooling, recurrent models, cross-slice attention, or lightweight fusion transformers.</p>
+<p>For example, a pretrained DINOv3-Large encoder can produce semantic embeddings for each 2D slice, while a smaller downstream model aggregates information across the full 3D volume.</p>
+<p>This hybrid strategy often provides a useful tradeoff between representation quality, memory efficiency, and computational cost.</p>
+<p>Importantly, LoRA reduces the number of trainable parameters during adaptation, but does not significantly reduce activation memory. Large batch sizes and high-resolution inputs therefore remain constrained primarily by attention activations rather than parameter storage alone.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="GPU Memory in Practice">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>GPU Memory in Practice
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>As a rough practical reference, fine-tuning a DINOv3-Large backbone with LoRA (<span class="math inline">\(r=8\)</span>) on a single 48GB GPU typically allows batch sizes on the order of <span class="math inline">\(\sim 32\)</span>–<span class="math inline">\(64\)</span> images for standard 2D inputs such as <span class="math inline">\(224\times224\)</span>, and substantially smaller effective batch sizes for high-resolution medical images or multi-slice fusion pipelines.</p>
+<p>For high-resolution or volumetric medical imaging, memory consumption is therefore driven much more strongly by image resolution, number of tokens, number of slices/views, and intermediate activations, than by the number of trainable LoRA parameters themselves.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="4. Extensions to Dense Prediction">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Extensions to Dense Prediction
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Vanilla Vision Transformers were originally developed for image classification, but many tasks require dense spatial predictions. Two key challenges arise: recovering spatial resolution from patch tokens, and producing multi-scale feature hierarchies.</p>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Decoding Patch Tokens for Dense Prediction">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Decoding Patch Tokens for Dense Prediction
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Many computer vision tasks require dense spatial predictions rather than a single class label, such as semantic segmentation, object detection, depth estimation, and medical image segmentation.</p>
+<p>A key challenge is that ViTs operate on a sequence of patch embeddings rather than dense pixel grids. Although the patch tokens retain spatial structure implicitly through positional embeddings, the native transformer output is relatively low-resolution.</p>
+<p>One simple strategy is to reshape the final patch embeddings back into a spatial grid:</p>
+<p><span class="math display">\[
+X_L \in \mathbb{R}^{N\times h}
+\quad \rightarrow \quad
+\mathbb{R}^{H/P \times W/P \times h}.
+\]</span></p>
+<p>A convolutional decoder can then progressively upsample these representations to recover dense pixel-level predictions. This approach is commonly used in hybrid ViT-U-Net architectures for medical imaging and semantic segmentation.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Hierarchical Transformers">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Hierarchical Transformers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Vanilla ViTs do not naturally produce multi-scale feature hierarchies in the way CNNs do. Convolutional networks progressively build representations at multiple spatial resolutions through pooling and strided convolutions, which is particularly useful for dense prediction tasks.</p>
+<p>Several hierarchical transformer architectures were therefore developed to address this limitation. One influential example is the <a href="https://arxiv.org/abs/2103.14030">Swin Transformer</a>, which restricts attention to local windows, progressively merges patches across layers, and constructs multi-scale feature pyramids similar to CNN hierarchies.</p>
+<p>These hierarchical designs substantially improve computational efficiency while producing representations better suited for dense spatial prediction tasks.</p>
+<p>More generally, patch token representations learned by Vision Transformers can be reused across a wide range of downstream tasks, including classification, segmentation, retrieval, detection, and multimodal representation learning.</p>
+<p>This transferability is one reason large self-supervised ViTs such as DINO have become widely adopted foundation models for computer vision.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p><span id="pos-embeddings"></span></p>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="5. Appendix A: Positional Embedding Variants">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Appendix A: Positional Embedding Variants
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Self-attention is permutation-invariant: without additional structure, the transformer cannot distinguish whether two patch embeddings originate from nearby or distant image regions. Positional embeddings inject spatial information into the token sequence, and several variants have been developed that trade off resolution generalization, inductive structure, and computational efficiency.</p>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Learned Absolute Positional Embeddings">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Learned Absolute Positional Embeddings
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Vanilla ViTs learn a parameter matrix <span class="math inline">\(E_{\text{pos}} \in \mathbb{R}^{(N+1)\times h}\)</span> with one embedding vector per patch location, added to the input token matrix:</p>
+<p><span class="math display">\[
+X_0 = \tilde X_{\text{patch}} + E_{\text{pos}}.
+\]</span></p>
+<p>This approach is simple and effective, but ties the model to a fixed input resolution. Changing image size changes the number of patch tokens <span class="math inline">\(N\)</span>, requiring positional embedding interpolation during transfer to new resolutions.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Sinusoidal Positional Embeddings">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Sinusoidal Positional Embeddings
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Transformers in NLP originally used deterministic sinusoidal embeddings:</p>
+<p><span class="math display">\[
+\mathrm{PE}(p,2i)
+=
+\sin\left(\frac{p}{10000^{2i/h}}\right),
+\qquad
+\mathrm{PE}(p,2i+1)
+=
+\cos\left(\frac{p}{10000^{2i/h}}\right).
+\]</span></p>
+<p>These embeddings require no learned parameters and naturally generalize to longer sequences. However, learned embeddings typically perform better in Vision Transformers.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Relative Positional Embeddings">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Relative Positional Embeddings
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><a href="https://arxiv.org/abs/1803.02155">Relative positional embeddings</a> encode relative spatial offsets between tokens rather than absolute patch locations. This allows attention to depend on relationships such as “one patch above” or “two patches left”, rather than fixed grid coordinates. Relative positional embeddings often improve transfer across resolutions and are widely used in hierarchical architectures such as Swin Transformers.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Rotary Positional Embeddings (RoPE)">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Rotary Positional Embeddings (RoPE)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><a href="https://arxiv.org/abs/2104.09864">Rotary positional embeddings (RoPE)</a> encode position through rotations applied directly to query and key vectors before attention. Rather than adding positional vectors to token embeddings, RoPE modifies the geometry of the attention computation itself, producing attention scores that depend naturally on relative token offsets. RoPE became particularly popular in large language models, though variants have increasingly been explored for Vision Transformers as well.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
