@@ -190,38 +190,20 @@ window.Quarto = {
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Consider an image</p>
+<p>Consider an image <span class="math inline">\(x \in \mathbb{R}^{H \times W \times C}\)</span>, with height <span class="math inline">\(H\)</span>, width <span class="math inline">\(W\)</span> and <span class="math inline">\(C\)</span> channels. A Vision Transformer splits the image into non-overlapping patches of size <span class="math inline">\(P \times P\)</span>. The number of patches is <span class="math inline">\(N = \frac{H}{P}\frac{W}{P}\)</span>. Each patch is flattened into a vector in <span class="math inline">\(\mathbb{R}^{P^2C}\)</span> and projected through a learned linear layer <span class="math inline">\(W_E \in \mathbb{R}^{(P^2C)\times h}\)</span>, producing a patch embedding of dimension <span class="math inline">\(h\)</span>. The resulting patch embedding matrix is <span class="math inline">\(X_{\text{patch}} \in \mathbb{R}^{N \times h}\)</span>.</p>
+<p>Next, a learnable CLS token <span class="math inline">\(x_{\text{cls}} \in \mathbb{R}^{1\times h}\)</span> is prepended:</p>
 <p><span class="math display">\[
-x \in \mathbb{R}^{H \times W \times C},
+\tilde X_{\text{patch}}
+=
+[x_{\text{cls}}; X_{\text{patch}}]
+\in
+\mathbb{R}^{(N+1)\times h}.
 \]</span></p>
-<p>with height <span class="math inline">\(H\)</span>, width <span class="math inline">\(W\)</span> and <span class="math inline">\(C\)</span> channels. A Vision Transformer splits the image into non-overlapping patches of size</p>
+<p>Finally, learnable positional embeddings, <span class="math inline">\(E_{\text{pos}} \in \mathbb{R}^{(N+1)\times h}\)</span>, are added to obtain the final transformer input matrix, <span class="math inline">\(X_0 \in \mathbb{R}^{(N+1)\times h}\)</span>:</p>
 <p><span class="math display">\[
-P \times P.
-\]</span></p>
-<p>The number of patches is</p>
-<p><span class="math display">\[
-N = \frac{H}{P}\frac{W}{P}.
-\]</span></p>
-<p>Each patch is flattened into a vector in <span class="math inline">\(\mathbb{R}^{P^2C}\)</span> and projected through a learned linear layer</p>
-<p><span class="math display">\[
-W_E \in \mathbb{R}^{(P^2C)\times h},
-\]</span></p>
-<p>producing a patch embedding of dimension <span class="math inline">\(h\)</span>.</p>
-<p>The resulting patch embedding matrix is</p>
-<p><span class="math display">\[
-X_{\text{patch}} \in \mathbb{R}^{N \times h}.
-\]</span></p>
-<p>A learnable CLS token is prepended and learnable positional embeddings are added:</p>
-<p><span class="math display">\[
-X_0 = X_{\text{patch}} + E_{\text{pos}},
-\]</span></p>
-<p>where</p>
-<p><span class="math display">\[
-E_{\text{pos}} \in \mathbb{R}^{(N+1)\times h}.
-\]</span></p>
-<p>The final transformer input therefore has shape</p>
-<p><span class="math display">\[
-X_0 \in \mathbb{R}^{(N+1)\times h}.
+X_0
+=
+\tilde X_{\text{patch}} + E_{\text{pos}},
 \]</span></p>
 <p>The positional embeddings encode spatial information about patch locations. In the original ViT formulation, these embeddings are simply initialized randomly and learned through gradient descent.</p>
 </div>
@@ -244,22 +226,8 @@ X_0 \in \mathbb{R}^{(N+1)\times h}.
 <p><span class="math display">\[
 X_0 \rightarrow X_1 \rightarrow \cdots \rightarrow X_L,
 \]</span></p>
-<p>while preserving the same shape throughout:</p>
-<p><span class="math display">\[
-X_\ell \in \mathbb{R}^{(N+1)\times h}.
-\]</span></p>
-<p>The key operation is self-attention. Given an input token matrix <span class="math inline">\(X\)</span>, the model computes learned projections</p>
-<p><span class="math display">\[
-Q=XW_Q,\quad K=XW_K,\quad V=XW_V,
-\]</span></p>
-<p>where</p>
-<p><span class="math display">\[
-W_Q,W_K,W_V \in \mathbb{R}^{h\times h}.
-\]</span></p>
-<p>This produces</p>
-<p><span class="math display">\[
-Q,K,V \in \mathbb{R}^{(N+1)\times h}.
-\]</span></p>
+<p>while preserving the same shape throughout, <span class="math inline">\(X_\ell \in \mathbb{R}^{(N+1)\times h}\)</span>.</p>
+<p>The key operation is self-attention. Given an input token matrix <span class="math inline">\(X\)</span>, the model computes learned projections <span class="math inline">\(Q=XW_Q\)</span>, <span class="math inline">\(K=XW_K\)</span>, and <span class="math inline">\(V=XW_V\)</span>, where <span class="math inline">\(W_Q,W_K,W_V \in \mathbb{R}^{h\times h}\)</span>. This produces <span class="math inline">\(Q,K,V \in \mathbb{R}^{(N+1)\times h}\)</span>.</p>
 <p>Importantly, the learnable parameters are the projection matrices <span class="math inline">\(W_Q,W_K,W_V\)</span>. The matrices <span class="math inline">\(Q,K,V\)</span> themselves are activations computed from the current input image.</p>
 <p>Attention is then computed via</p>
 <p><span class="math display">\[
@@ -267,7 +235,7 @@ Q,K,V \in \mathbb{R}^{(N+1)\times h}.
 =
 \mathrm{softmax}\left(\frac{QK^\top}{\sqrt d}\right)V.
 \]</span></p>
-<p>Here, the matrix <span class="math inline">\(QK^\top \in \mathbb{R}^{(N+1)\times(N+1)}\)</span> contains affinities between all token pairs. This allows every patch to directly exchange information with every other patch. The attention output <span class="math inline">\(\mathrm{Attn}(X)\)</span> is a weighted combination of value vectors. For a token <span class="math inline">\(i\)</span>, the output is <span class="math inline">\(\sum_j \alpha_{ij} v_j\)</span>, where: <span class="math inline">\(v_j\)</span> is the value vector of token <span class="math inline">\(j\)</span>, and <span class="math inline">\(\alpha_{ij}\)</span> is the attention weight between tokens <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> Each token representation thus becomes a dynamically computed mixture of information from other tokens in the image.</p>
+<p>Here, the matrix <span class="math inline">\(QK^\top \in \mathbb{R}^{(N+1)\times(N+1)}\)</span> contains affinities between all token pairs. This allows every patch to directly exchange information with every other patch. The attention output <span class="math inline">\(\mathrm{Attn}(X)\)</span> is a weighted combination of value vectors. For a token <span class="math inline">\(i\)</span>, the output is <span class="math inline">\(\sum_j \alpha_{ij} v_j\)</span>, where: <span class="math inline">\(v_j\)</span> is the value vector of token <span class="math inline">\(j\)</span>, and <span class="math inline">\(\alpha_{ij}\)</span> is the attention weight between tokens <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. Each token representation thus becomes a dynamically computed mixture of information from other tokens in the image.</p>
 </div>
 </div>
 </div>
@@ -285,26 +253,13 @@ Q,K,V \in \mathbb{R}^{(N+1)\times h}.
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Rather than using a single attention operation, Vision Transformers use multi-head attention (MHA).</p>
-<p>The embedding dimension is split into multiple heads:</p>
-<p><span class="math display">\[
-h = md,
-\]</span></p>
-<p>where <span class="math inline">\(m\)</span> = number of attention heads, and <span class="math inline">\(d\)</span> = dimension per head</p>
-<p>Each head independently performs attention in <span class="math inline">\(\mathbb{R}^d\)</span>. The resulting head outputs</p>
-<p><span class="math display">\[
-H_i \in \mathbb{R}^{(N+1)\times d}
-\]</span></p>
-<p>are concatenated:</p>
+<p>The embedding dimension is split into multiple heads: <span class="math inline">\(h = md\)</span>, where <span class="math inline">\(m\)</span> = number of attention heads, and <span class="math inline">\(d\)</span> = dimension per head. Each head independently performs attention in <span class="math inline">\(\mathbb{R}^d\)</span>. The resulting head outputs <span class="math inline">\(H_i \in \mathbb{R}^{(N+1)\times d}\)</span> are concatenated:</p>
 <p><span class="math display">\[
 [H_1;\dots;H_m]
 \in
 \mathbb{R}^{(N+1)\times h}.
 \]</span></p>
-<p>A final learned projection</p>
-<p><span class="math display">\[
-W_O \in \mathbb{R}^{h\times h}
-\]</span></p>
-<p>mixes information across heads.</p>
+<p>A final learned projection <span class="math inline">\(W_O \in \mathbb{R}^{h\times h}\)</span> mixes information across heads.</p>
 <p>Empirically, different heads often learn different relational structures: some focus on local neighborhoods, others on long-range interactions or semantic structure. One interpretation is that multiple heads allow the model to learn several distinct token-to-token affinity structures simultaneously.</p>
 </div>
 </div>
@@ -336,12 +291,59 @@ X_{\ell+1}
 Y_\ell + \mathrm{MLP}(\mathrm{LN}(Y_\ell)).
 \]</span></p>
 <p>LayerNorm acts independently on each token across its feature dimension <span class="math inline">\(h\)</span>.</p>
-<p>The MLP also acts independently on each token, typically using</p>
-<p><span class="math display">\[
-h \rightarrow 4h \rightarrow h,
-\]</span></p>
-<p>with <a href="https://arxiv.org/pdf/1606.08415">GELU</a> activation.</p>
+<p>The MLP also acts independently on each token, typically using <span class="math inline">\(h \rightarrow 4h \rightarrow h\)</span>, with <a href="https://arxiv.org/pdf/1606.08415">GELU</a> activation.</p>
 <p>Attention mixes information across tokens, while the MLP mixes information within the features of a token. By repeatedly alternating these operations, the model builds increasingly abstract visual representations across layers. Finally, the CLS token from the final layer is passed to a classifier head for prediction.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="5. Low-Rank Adaptation (LoRA)">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Low-Rank Adaptation (LoRA)
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Large Vision Transformers are often adapted to downstream tasks using Low-Rank Adaptation (LoRA).</p>
+<p>Suppose a pretrained projection matrix is <span class="math inline">\(W \in \mathbb{R}^{h\times h}\)</span>. Rather than updating the full matrix during fine-tuning, LoRA freezes <span class="math inline">\(W\)</span> and learns a low-rank update:</p>
+<p><span class="math display">\[
+W' = W + BA,
+\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+A \in \mathbb{R}^{r\times h},
+\qquad
+B \in \mathbb{R}^{h\times r},
+\]</span></p>
+<p>with rank <span class="math inline">\(r \ll h\)</span>.</p>
+<p>The low-rank update therefore contains only <span class="math inline">\(2hr\)</span> learnable parameters rather than the full <span class="math inline">\(h^2\)</span>.</p>
+<p>LoRA is commonly applied to the attention projection matrices <span class="math inline">\(W_Q\)</span>, <span class="math inline">\(W_K\)</span>, <span class="math inline">\(W_V\)</span>, and <span class="math inline">\(W_O\)</span>, though many implementations adapt only a subset of these.</p>
+<p>One interpretation is that downstream tasks often require only small coordinated shifts in representation geometry. Empirically, these low-rank updates are frequently sufficient to adapt large pretrained transformers while dramatically reducing memory and training cost.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="6. Parameter Counts in ViTs and LoRA">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Parameter Counts in ViTs and LoRA
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>To understand the scale of modern Vision Transformers, consider a transformer block with embedding dimension <span class="math inline">\(h\)</span>. For example, DINOv3-Large uses <span class="math inline">\(h = 1024\)</span>. The attention projection matrices in each transformer block are <span class="math inline">\(W_Q,W_K,W_V,W_O \in \mathbb{R}^{h\times h}\)</span>. Each contains <span class="math inline">\(h^2\)</span> parameters.</p>
+<p>For DINOv3-Large: <span class="math inline">\(h^2 = 1024^2 \approx 1\text{M}\)</span> parameters per matrix. Since multi-head attention contains four such matrices, the total attention parameter count per transformer block is <span class="math inline">\(4h^2 \approx 4\text{M}\)</span>. The feedforward MLP typically uses <span class="math inline">\(h \rightarrow 4h \rightarrow h\)</span>, giving parameter count <span class="math inline">\(h(4h) + (4h)h = 8h^2 \approx 8\text{M}\)</span>. DINOv3-large has 24 transformer blocks, thus total parameter count <span class="math inline">\(24*8\text{M} \approx 288\text{M}\)</span>.</p>
+<p>In practice, LoRA updates only a tiny fraction of these parameters. Suppose LoRA uses rank <span class="math inline">\(r=8\)</span> and adapts the four attention projection matrices <span class="math inline">\(W_Q,W_K,W_V,W_O\)</span> in each transformer block. For a single matrix, LoRA learns <span class="math inline">\(A \in \mathbb{R}^{r\times h}, B \in \mathbb{R}^{h\times r}\)</span>, giving <span class="math inline">\(2hr = 2(1024)(8) \approx 16\text{k}\)</span> trainable parameters instead of <span class="math inline">\(h^2 \approx 1\text{M}\)</span>. Applying LoRA to all four attention projections across all 24 transformer blocks corresponds to approximately <span class="math inline">\(24 * 4 * 16\text{k} \approx 1.6\text{M}\)</span>.</p>
+<p>Thus, LoRA updates only approximately <span class="math inline">\(\frac{1.6}{288} \approx 0.56\%\)</span> of the model parameters. This large reduction in trainable parameters substantially lowers memory usage and optimization cost during fine-tuning while often preserving strong downstream performance.</p>
 </div>
 </div>
 </div>
