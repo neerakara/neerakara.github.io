@@ -13,55 +13,28 @@ patch embeddings, positional encodings, multi-head self-attention and transforme
 
 
 ::: {.callout-note collapse="true" icon="false" title="1. Patch Embeddings"}
-Consider an image
+Consider an image $x \in \mathbb{R}^{H \times W \times C}$, with height $H$, width $W$ and $C$ channels.
+A Vision Transformer splits the image into non-overlapping patches of size $P \times P$.
+The number of patches is $N = \frac{H}{P}\frac{W}{P}$.
+Each patch is flattened into a vector in $\mathbb{R}^{P^2C}$ and projected through a learned linear layer $W_E \in \mathbb{R}^{(P^2C)\times h}$, producing a patch embedding of dimension $h$.
+The resulting patch embedding matrix is $X_{\text{patch}} \in \mathbb{R}^{N \times h}$.
+
+Next, a learnable CLS token $x_{\text{cls}} \in \mathbb{R}^{1\times h}$ is prepended:
 
 $$
-x \in \mathbb{R}^{H \times W \times C},
+\tilde X_{\text{patch}}
+=
+[x_{\text{cls}}; X_{\text{patch}}]
+\in
+\mathbb{R}^{(N+1)\times h}.
 $$
 
-with height $H$, width $W$ and $C$ channels.
-A Vision Transformer splits the image into non-overlapping patches of size
+Finally, learnable positional embeddings, $E_{\text{pos}} \in \mathbb{R}^{(N+1)\times h}$, are added to obtain the final transformer input matrix, $X_0 \in \mathbb{R}^{(N+1)\times h}$:
 
 $$
-P \times P.
-$$
-
-The number of patches is
-
-$$
-N = \frac{H}{P}\frac{W}{P}.
-$$
-
-Each patch is flattened into a vector in $\mathbb{R}^{P^2C}$ and projected through a learned linear layer
-
-$$
-W_E \in \mathbb{R}^{(P^2C)\times h},
-$$
-
-producing a patch embedding of dimension $h$.
-
-The resulting patch embedding matrix is
-
-$$
-X_{\text{patch}} \in \mathbb{R}^{N \times h}.
-$$
-
-A learnable CLS token is prepended and learnable positional embeddings are added:
-
-$$
-X_0 = X_{\text{patch}} + E_{\text{pos}},
-$$
-
-where
-
-$$
-E_{\text{pos}} \in \mathbb{R}^{(N+1)\times h}.
-$$
-
-The final transformer input therefore has shape
-
-$$
-X_0 \in \mathbb{R}^{(N+1)\times h}.
+X_0
+=
+\tilde X_{\text{patch}} + E_{\text{pos}},
 $$
 
 The positional embeddings encode spatial information about patch locations.
@@ -77,30 +50,11 @@ $$
 X_0 \rightarrow X_1 \rightarrow \cdots \rightarrow X_L,
 $$
 
-while preserving the same shape throughout:
-
-$$
-X_\ell \in \mathbb{R}^{(N+1)\times h}.
-$$
+while preserving the same shape throughout, $X_\ell \in \mathbb{R}^{(N+1)\times h}$.
 
 The key operation is self-attention.
-Given an input token matrix $X$, the model computes learned projections
-
-$$
-Q=XW_Q,\quad K=XW_K,\quad V=XW_V,
-$$
-
-where
-
-$$
-W_Q,W_K,W_V \in \mathbb{R}^{h\times h}.
-$$
-
-This produces
-
-$$
-Q,K,V \in \mathbb{R}^{(N+1)\times h}.
-$$
+Given an input token matrix $X$, the model computes learned projections $Q=XW_Q$, $K=XW_K$, and $V=XW_V$, where $W_Q,W_K,W_V \in \mathbb{R}^{h\times h}$.
+This produces $Q,K,V \in \mathbb{R}^{(N+1)\times h}$.
 
 Importantly, the learnable parameters are the projection matrices $W_Q,W_K,W_V$.
 The matrices $Q,K,V$ themselves are activations computed from the current input image.
@@ -119,7 +73,7 @@ This allows every patch to directly exchange information with every other patch.
 The attention output $\mathrm{Attn}(X)$ is a weighted combination of value vectors.
 For a token $i$, the output is $\sum_j \alpha_{ij} v_j$, where:
 $v_j$ is the value vector of token $j$, and
-$\alpha_{ij}$ is the attention weight between tokens $i$ and $j$
+$\alpha_{ij}$ is the attention weight between tokens $i$ and $j$.
 Each token representation thus becomes a dynamically computed mixture of information from other tokens in the image.
 :::
 
@@ -129,20 +83,10 @@ Each token representation thus becomes a dynamically computed mixture of informa
 Rather than using a single attention operation, Vision Transformers use multi-head attention (MHA).
 
 The embedding dimension is split into multiple heads:
-
-$$
-h = md,
-$$
-
-where $m$ = number of attention heads, and $d$ = dimension per head
-
+$h = md$,
+where $m$ = number of attention heads, and $d$ = dimension per head.
 Each head independently performs attention in $\mathbb{R}^d$.
-The resulting head outputs
-
-$$
-H_i \in \mathbb{R}^{(N+1)\times d}
-$$
-
+The resulting head outputs $H_i \in \mathbb{R}^{(N+1)\times d}$
 are concatenated:
 
 $$
@@ -151,13 +95,7 @@ $$
 \mathbb{R}^{(N+1)\times h}.
 $$
 
-A final learned projection
-
-$$
-W_O \in \mathbb{R}^{h\times h}
-$$
-
-mixes information across heads.
+A final learned projection $W_O \in \mathbb{R}^{h\times h}$ mixes information across heads.
 
 Empirically, different heads often learn different relational structures:
 some focus on local neighborhoods, others on long-range interactions or semantic structure.
@@ -191,15 +129,71 @@ $$
 
 LayerNorm acts independently on each token across its feature dimension $h$.
 
-The MLP also acts independently on each token, typically using
-
-$$
-h \rightarrow 4h \rightarrow h,
-$$
-
+The MLP also acts independently on each token, typically using $h \rightarrow 4h \rightarrow h$,
 with [GELU](https://arxiv.org/pdf/1606.08415) activation.
 
 Attention mixes information across tokens, while the MLP mixes information within the features of a token.
 By repeatedly alternating these operations, the model builds increasingly abstract visual representations across layers.
 Finally, the CLS token from the final layer is passed to a classifier head for prediction.
 :::
+
+---
+
+::: {.callout-note collapse="true" icon="false" title="5. Low-Rank Adaptation (LoRA)"}
+Large Vision Transformers are often adapted to downstream tasks using Low-Rank Adaptation (LoRA).
+
+Suppose a pretrained projection matrix is $W \in \mathbb{R}^{h\times h}$.
+Rather than updating the full matrix during fine-tuning, LoRA freezes $W$ and learns a low-rank update:
+
+$$
+W' = W + BA,
+$$
+
+where
+
+$$
+A \in \mathbb{R}^{r\times h},
+\qquad
+B \in \mathbb{R}^{h\times r},
+$$
+
+with rank $r \ll h$.
+
+The low-rank update therefore contains only $2hr$ learnable parameters rather than the full $h^2$.
+
+LoRA is commonly applied to the attention projection matrices $W_Q$, $W_K$, $W_V$, and $W_O$, though many implementations adapt only a subset of these.
+
+One interpretation is that downstream tasks often require only small coordinated shifts in representation geometry.
+Empirically, these low-rank updates are frequently sufficient to adapt large pretrained transformers while dramatically reducing memory and training cost.
+:::
+
+---
+
+::: {.callout-note collapse="true" icon="false" title="6. Parameter Counts in ViTs and LoRA"}
+To understand the scale of modern Vision Transformers, consider a transformer block with
+embedding dimension $h$.
+For example, DINOv3-Large uses $h = 1024$.
+The attention projection matrices in each transformer block are $W_Q,W_K,W_V,W_O \in \mathbb{R}^{h\times h}$.
+Each contains $h^2$ parameters.
+
+For DINOv3-Large:
+$h^2 = 1024^2 \approx 1\text{M}$ parameters per matrix.
+Since multi-head attention contains four such matrices, the total attention parameter count per transformer block is $4h^2 \approx 4\text{M}$.
+The feedforward MLP typically uses $h \rightarrow 4h \rightarrow h$, giving parameter count $h(4h) + (4h)h = 8h^2 \approx 8\text{M}$.
+DINOv3-large has 24 transformer blocks, thus total parameter count $24*8\text{M} \approx 288\text{M}$.
+
+In practice, LoRA updates only a tiny fraction of these parameters.
+Suppose LoRA uses rank $r=8$ and adapts the four attention projection matrices $W_Q,W_K,W_V,W_O$ in each transformer block.
+For a single matrix, LoRA learns
+$A \in \mathbb{R}^{r\times h}, B \in \mathbb{R}^{h\times r}$,  giving
+$2hr = 2(1024)(8) \approx 16\text{k}$
+trainable parameters instead of
+$h^2 \approx 1\text{M}$.
+Applying LoRA to all four attention projections across all 24 transformer blocks corresponds to approximately
+$24 * 4 * 16\text{k} \approx 1.6\text{M}$.
+
+Thus, LoRA updates only approximately
+$\frac{1.6}{288} \approx 0.56\%$
+of the model parameters.
+This large reduction in trainable parameters substantially lowers memory usage and optimization cost during fine-tuning while often preserving strong downstream performance.
+::: 
