@@ -2,6 +2,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/models/vision_transformers.html",
       "/blog/optimization/optimization_basics.html",
       "/blog/stats/mutual_info.html"
     ]
