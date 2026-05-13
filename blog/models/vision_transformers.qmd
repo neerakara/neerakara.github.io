@@ -1,0 +1,205 @@
+---
+title: "Intro to Vision Transformers"
+description: "An introduction to Vision Transformers (ViTs): patch embeddings, self-attention and transformer blocks."
+categories: [Deep Learning]
+---
+
+[Vision Transformers](https://arxiv.org/abs/2010.11929) (ViTs) adapt the transformer architecture from natural language processing to images.
+Instead of processing pixels through convolutional filters, ViTs represent an image as a sequence of patch tokens and apply self-attention across them.
+This allows every image region to directly interact with every other region at every layer.
+
+This post introduces the basic structure of a vanilla Vision Transformer:
+patch embeddings, positional encodings, multi-head self-attention and transformer blocks.
+
+
+::: {.callout-note collapse="true" icon="false" title="1. Patch Embeddings"}
+Consider an image
+
+$$
+x \in \mathbb{R}^{H \times W \times C},
+$$
+
+with height $H$, width $W$ and $C$ channels.
+A Vision Transformer splits the image into non-overlapping patches of size
+
+$$
+P \times P.
+$$
+
+The number of patches is
+
+$$
+N = \frac{H}{P}\frac{W}{P}.
+$$
+
+Each patch is flattened into a vector in $\mathbb{R}^{P^2C}$ and projected through a learned linear layer
+
+$$
+W_E \in \mathbb{R}^{(P^2C)\times h},
+$$
+
+producing a patch embedding of dimension $h$.
+
+The resulting patch embedding matrix is
+
+$$
+X_{\text{patch}} \in \mathbb{R}^{N \times h}.
+$$
+
+A learnable CLS token is prepended and learnable positional embeddings are added:
+
+$$
+X_0 = X_{\text{patch}} + E_{\text{pos}},
+$$
+
+where
+
+$$
+E_{\text{pos}} \in \mathbb{R}^{(N+1)\times h}.
+$$
+
+The final transformer input therefore has shape
+
+$$
+X_0 \in \mathbb{R}^{(N+1)\times h}.
+$$
+
+The positional embeddings encode spatial information about patch locations.
+In the original ViT formulation, these embeddings are simply initialized randomly and learned through gradient descent.
+:::
+
+---
+
+::: {.callout-note collapse="true" icon="false" title="2. Self-Attention"}
+The transformer processes the token matrix through a sequence of layers:
+
+$$
+X_0 \rightarrow X_1 \rightarrow \cdots \rightarrow X_L,
+$$
+
+while preserving the same shape throughout:
+
+$$
+X_\ell \in \mathbb{R}^{(N+1)\times h}.
+$$
+
+The key operation is self-attention.
+Given an input token matrix $X$, the model computes learned projections
+
+$$
+Q=XW_Q,\quad K=XW_K,\quad V=XW_V,
+$$
+
+where
+
+$$
+W_Q,W_K,W_V \in \mathbb{R}^{h\times h}.
+$$
+
+This produces
+
+$$
+Q,K,V \in \mathbb{R}^{(N+1)\times h}.
+$$
+
+Importantly, the learnable parameters are the projection matrices $W_Q,W_K,W_V$.
+The matrices $Q,K,V$ themselves are activations computed from the current input image.
+
+Attention is then computed via
+
+$$
+\mathrm{Attn}(X)
+=
+\mathrm{softmax}\left(\frac{QK^\top}{\sqrt d}\right)V.
+$$
+
+Here, the matrix $QK^\top \in \mathbb{R}^{(N+1)\times(N+1)}$
+contains affinities between all token pairs.
+This allows every patch to directly exchange information with every other patch.
+The attention output $\mathrm{Attn}(X)$ is a weighted combination of value vectors.
+For a token $i$, the output is $\sum_j \alpha_{ij} v_j$, where:
+$v_j$ is the value vector of token $j$, and
+$\alpha_{ij}$ is the attention weight between tokens $i$ and $j$
+Each token representation thus becomes a dynamically computed mixture of information from other tokens in the image.
+:::
+
+---
+
+::: {.callout-note collapse="true" icon="false" title="3. Multi-Head Attention"}
+Rather than using a single attention operation, Vision Transformers use multi-head attention (MHA).
+
+The embedding dimension is split into multiple heads:
+
+$$
+h = md,
+$$
+
+where $m$ = number of attention heads, and $d$ = dimension per head
+
+Each head independently performs attention in $\mathbb{R}^d$.
+The resulting head outputs
+
+$$
+H_i \in \mathbb{R}^{(N+1)\times d}
+$$
+
+are concatenated:
+
+$$
+[H_1;\dots;H_m]
+\in
+\mathbb{R}^{(N+1)\times h}.
+$$
+
+A final learned projection
+
+$$
+W_O \in \mathbb{R}^{h\times h}
+$$
+
+mixes information across heads.
+
+Empirically, different heads often learn different relational structures:
+some focus on local neighborhoods, others on long-range interactions or semantic structure.
+One interpretation is that multiple heads allow the model to learn several distinct token-to-token affinity structures simultaneously.
+:::
+
+---
+
+::: {.callout-note collapse="true" icon="false" title="4. Transformer Blocks"}
+Each transformer block combines:
+layer normalization,
+multi-head attention,
+residual connections, and
+a feedforward MLP.
+
+The block structure is
+
+$$
+Y_\ell
+=
+X_\ell + \mathrm{MHA}(\mathrm{LN}(X_\ell)),
+$$
+
+followed by
+
+$$
+X_{\ell+1}
+=
+Y_\ell + \mathrm{MLP}(\mathrm{LN}(Y_\ell)).
+$$
+
+LayerNorm acts independently on each token across its feature dimension $h$.
+
+The MLP also acts independently on each token, typically using
+
+$$
+h \rightarrow 4h \rightarrow h,
+$$
+
+with [GELU](https://arxiv.org/pdf/1606.08415) activation.
+
+Attention mixes information across tokens, while the MLP mixes information within the features of a token.
+By repeatedly alternating these operations, the model builds increasingly abstract visual representations across layers.
+Finally, the CLS token from the final layer is passed to a classifier head for prediction.
+:::

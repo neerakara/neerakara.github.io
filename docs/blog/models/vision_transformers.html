@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="An introduction to Vision Transformers (ViTs): patch embeddings, self-attention and transformer blocks.">
 
-<title>Posts – Neerav Karani</title>
+<title>Intro to Vision Transformers – Neerav Karani</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,26 +24,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,91 +69,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-models .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-models'] = new List('listing-models', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-optimization .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-optimization'] = new List('listing-optimization', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-stats .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-stats'] = new List('listing-stats', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -186,17 +100,17 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent quarto-light">
+<body class="nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Neerav Karani</span>
     </a>
   </div>
@@ -207,15 +121,15 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../blog/index.html" aria-current="page"> 
+    <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
 </ul>
@@ -229,15 +143,25 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Posts</h1>
-</div>
+<h1 class="title">Intro to Vision Transformers</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Deep Learning</div>
+  </div>
+  </div>
 
+<div>
+  <div class="description">
+    An introduction to Vision Transformers (ViTs): patch embeddings, self-attention and transformer blocks.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -252,72 +176,175 @@ window.Quarto = {
 </header>
 
 
-<div class="posts-listing-page">
-<section id="models" class="level2">
-<h2 class="anchored" data-anchor-id="models">Models</h2>
-<div id="listing-models" class="quarto-listing quarto-listing-container-grid">
-<div class="list grid quarto-listing-cols-1">
-<div class="g-col-1" data-index="0" data-categories="RGVlcCUyMExlYXJuaW5n" data-listing-file-modified-sort="1778664150857" data-listing-reading-time-sort="3" data-listing-word-count-sort="525">
-<a href="../blog/models/vision_transformers.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Intro to Vision Transformers
-</h5>
-<div class="card-text listing-description delink">
-<p>An introduction to Vision Transformers (ViTs): patch embeddings, self-attention and transformer blocks.</p>
+<p><a href="https://arxiv.org/abs/2010.11929">Vision Transformers</a> (ViTs) adapt the transformer architecture from natural language processing to images. Instead of processing pixels through convolutional filters, ViTs represent an image as a sequence of patch tokens and apply self-attention across them. This allows every image region to directly interact with every other region at every layer.</p>
+<p>This post introduces the basic structure of a vanilla Vision Transformer: patch embeddings, positional encodings, multi-head self-attention and transformer blocks.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="1. Patch Embeddings">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Patch Embeddings
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Consider an image</p>
+<p><span class="math display">\[
+x \in \mathbb{R}^{H \times W \times C},
+\]</span></p>
+<p>with height <span class="math inline">\(H\)</span>, width <span class="math inline">\(W\)</span> and <span class="math inline">\(C\)</span> channels. A Vision Transformer splits the image into non-overlapping patches of size</p>
+<p><span class="math display">\[
+P \times P.
+\]</span></p>
+<p>The number of patches is</p>
+<p><span class="math display">\[
+N = \frac{H}{P}\frac{W}{P}.
+\]</span></p>
+<p>Each patch is flattened into a vector in <span class="math inline">\(\mathbb{R}^{P^2C}\)</span> and projected through a learned linear layer</p>
+<p><span class="math display">\[
+W_E \in \mathbb{R}^{(P^2C)\times h},
+\]</span></p>
+<p>producing a patch embedding of dimension <span class="math inline">\(h\)</span>.</p>
+<p>The resulting patch embedding matrix is</p>
+<p><span class="math display">\[
+X_{\text{patch}} \in \mathbb{R}^{N \times h}.
+\]</span></p>
+<p>A learnable CLS token is prepended and learnable positional embeddings are added:</p>
+<p><span class="math display">\[
+X_0 = X_{\text{patch}} + E_{\text{pos}},
+\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+E_{\text{pos}} \in \mathbb{R}^{(N+1)\times h}.
+\]</span></p>
+<p>The final transformer input therefore has shape</p>
+<p><span class="math display">\[
+X_0 \in \mathbb{R}^{(N+1)\times h}.
+\]</span></p>
+<p>The positional embeddings encode spatial information about patch locations. In the original ViT formulation, these embeddings are simply initialized randomly and learned through gradient descent.</p>
 </div>
 </div>
-</div></a>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="2. Self-Attention">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Self-Attention
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The transformer processes the token matrix through a sequence of layers:</p>
+<p><span class="math display">\[
+X_0 \rightarrow X_1 \rightarrow \cdots \rightarrow X_L,
+\]</span></p>
+<p>while preserving the same shape throughout:</p>
+<p><span class="math display">\[
+X_\ell \in \mathbb{R}^{(N+1)\times h}.
+\]</span></p>
+<p>The key operation is self-attention. Given an input token matrix <span class="math inline">\(X\)</span>, the model computes learned projections</p>
+<p><span class="math display">\[
+Q=XW_Q,\quad K=XW_K,\quad V=XW_V,
+\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+W_Q,W_K,W_V \in \mathbb{R}^{h\times h}.
+\]</span></p>
+<p>This produces</p>
+<p><span class="math display">\[
+Q,K,V \in \mathbb{R}^{(N+1)\times h}.
+\]</span></p>
+<p>Importantly, the learnable parameters are the projection matrices <span class="math inline">\(W_Q,W_K,W_V\)</span>. The matrices <span class="math inline">\(Q,K,V\)</span> themselves are activations computed from the current input image.</p>
+<p>Attention is then computed via</p>
+<p><span class="math display">\[
+\mathrm{Attn}(X)
+=
+\mathrm{softmax}\left(\frac{QK^\top}{\sqrt d}\right)V.
+\]</span></p>
+<p>Here, the matrix <span class="math inline">\(QK^\top \in \mathbb{R}^{(N+1)\times(N+1)}\)</span> contains affinities between all token pairs. This allows every patch to directly exchange information with every other patch. The attention output <span class="math inline">\(\mathrm{Attn}(X)\)</span> is a weighted combination of value vectors. For a token <span class="math inline">\(i\)</span>, the output is <span class="math inline">\(\sum_j \alpha_{ij} v_j\)</span>, where: <span class="math inline">\(v_j\)</span> is the value vector of token <span class="math inline">\(j\)</span>, and <span class="math inline">\(\alpha_{ij}\)</span> is the attention weight between tokens <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> Each token representation thus becomes a dynamically computed mixture of information from other tokens in the image.</p>
 </div>
 </div>
-<div class="listing-no-matching d-none">No matching items</div>
 </div>
-</section>
-<section id="optimization" class="level2">
-<h2 class="anchored" data-anchor-id="optimization">Optimization</h2>
-<div id="listing-optimization" class="quarto-listing quarto-listing-container-grid">
-<div class="list grid quarto-listing-cols-1">
-<div class="g-col-1" data-index="0" data-categories="T3B0aW1pemF0aW9u" data-listing-file-modified-sort="1774000399002" data-listing-reading-time-sort="6" data-listing-word-count-sort="1118">
-<a href="../blog/optimization/optimization_basics.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Machine Learning Optimization Basics
-</h5>
-<div class="card-text listing-description delink">
-<p>An intro to the main objects in ML optimization: gradients, Jacobians and Hessians.</p>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="3. Multi-Head Attention">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
 </div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Multi-Head Attention
 </div>
-</div></a>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div>
-</section>
-<section id="stats" class="level2">
-<h2 class="anchored" data-anchor-id="stats">Stats</h2>
-<div id="listing-stats" class="quarto-listing quarto-listing-container-grid">
-<div class="list grid quarto-listing-cols-1">
-<div class="g-col-1" data-index="0" data-categories="U3RhdGlzdGljcw==" data-listing-file-modified-sort="1778663438391" data-listing-reading-time-sort="7" data-listing-word-count-sort="1210">
-<a href="../blog/stats/mutual_info.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Mutual Information
-</h5>
-<div class="card-text listing-description delink">
-<p>Measuring statistical dependence between random variables</p>
-</div>
-</div>
-</div></a>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Rather than using a single attention operation, Vision Transformers use multi-head attention (MHA).</p>
+<p>The embedding dimension is split into multiple heads:</p>
+<p><span class="math display">\[
+h = md,
+\]</span></p>
+<p>where <span class="math inline">\(m\)</span> = number of attention heads, and <span class="math inline">\(d\)</span> = dimension per head</p>
+<p>Each head independently performs attention in <span class="math inline">\(\mathbb{R}^d\)</span>. The resulting head outputs</p>
+<p><span class="math display">\[
+H_i \in \mathbb{R}^{(N+1)\times d}
+\]</span></p>
+<p>are concatenated:</p>
+<p><span class="math display">\[
+[H_1;\dots;H_m]
+\in
+\mathbb{R}^{(N+1)\times h}.
+\]</span></p>
+<p>A final learned projection</p>
+<p><span class="math display">\[
+W_O \in \mathbb{R}^{h\times h}
+\]</span></p>
+<p>mixes information across heads.</p>
+<p>Empirically, different heads often learn different relational structures: some focus on local neighborhoods, others on long-range interactions or semantic structure. One interpretation is that multiple heads allow the model to learn several distinct token-to-token affinity structures simultaneously.</p>
 </div>
 </div>
-<div class="listing-no-matching d-none">No matching items</div>
 </div>
-</section>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="4. Transformer Blocks">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
 </div>
-
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Transformer Blocks
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Each transformer block combines: layer normalization, multi-head attention, residual connections, and a feedforward MLP.</p>
+<p>The block structure is</p>
+<p><span class="math display">\[
+Y_\ell
+=
+X_\ell + \mathrm{MHA}(\mathrm{LN}(X_\ell)),
+\]</span></p>
+<p>followed by</p>
+<p><span class="math display">\[
+X_{\ell+1}
+=
+Y_\ell + \mathrm{MLP}(\mathrm{LN}(Y_\ell)).
+\]</span></p>
+<p>LayerNorm acts independently on each token across its feature dimension <span class="math inline">\(h\)</span>.</p>
+<p>The MLP also acts independently on each token, typically using</p>
+<p><span class="math display">\[
+h \rightarrow 4h \rightarrow h,
+\]</span></p>
+<p>with <a href="https://arxiv.org/pdf/1606.08415">GELU</a> activation.</p>
+<p>Attention mixes information across tokens, while the MLP mixes information within the features of a token. By repeatedly alternating these operations, the model builds increasingly abstract visual representations across layers. Finally, the CLS token from the final layer is passed to a classifier head for prediction.</p>
+</div>
+</div>
+</div>
 
 
 
