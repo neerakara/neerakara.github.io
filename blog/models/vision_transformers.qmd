@@ -1,384 +1,324 @@
 ---
 title: "Intro to Vision Transformers"
-description: "A practical introduction to Vision Transformers (ViTs): patch embeddings, positional encodings, self-attention, and transformer blocks."
+description: ""
 categories: [Deep Learning]
 ---
 
-[Vision Transformers](https://arxiv.org/abs/2010.11929) (ViTs) adapt the transformer architecture from natural language processing to images.
-Instead of using convolutional filters over local neighborhoods, ViTs split an image into patches, represent each patch as a token, and apply self-attention over the full token sequence.
-This allows information to flow directly between distant image regions at every layer.
-
-This post starts with the core ViT architecture, then moves through training and adaptation (self-supervised pretraining and LoRA), practical deployment constraints (scaling and memory), and downstream extensions for dense prediction, with a final appendix on positional embedding variants.
+[Vision Transformers](https://arxiv.org/abs/2010.11929) (ViTs) adapt the [transformer](https://arxiv.org/abs/1706.03762) architecture from natural language processing to images.
+In this note, let's discuss the architecture of these models,
+their pretraining and fine-tuning,
+usage for downstream tasks,
+and the memory and scaling considerations.
 
 ::: {.callout-note collapse="true" icon="false" title="1. Architecture"}
 
-::: {.callout-note collapse="true" icon="false" title="Patch Embeddings"}
+::: {.callout-note collapse="true" icon="false" title="Image → Sequence of Tokens"}
 Consider an image $x \in \mathbb{R}^{H \times W \times C}$, with height $H$, width $W$ and $C$ channels.
-A Vision Transformer splits the image into non-overlapping patches of size $P \times P$.
-The number of patches is $N = \frac{H}{P}\frac{W}{P}$.
-Each patch is flattened into a vector in $\mathbb{R}^{P^2C}$ and projected through a learned linear layer $W_E \in \mathbb{R}^{(P^2C)\times h}$, producing a patch embedding of dimension $h$.
-The resulting patch embedding matrix is $X_{\text{patch}} \in \mathbb{R}^{N \times h}$.
-
-Next, a learnable CLS token $x_{\text{cls}} \in \mathbb{R}^{1\times h}$ is prepended:
+To feed it into a transformer, we first convert it into a sequence of tokens through three steps:
 
 $$
-\tilde X_{\text{patch}}
-=
-[x_{\text{cls}}; X_{\text{patch}}]
-\in
-\mathbb{R}^{(N+1)\times h}.
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^{H\times W\times C}}{x}
+\xrightarrow{\text{patch + project}}
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^{N\times d}}{\tilde X}
+\xrightarrow{\text{prepend CLS}}
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^{(N+1)\times d}}{X}
+\xrightarrow{\text{add pos. emb.}}
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^{(N+1)\times d}}{X_0}
 $$
 
-Finally, learnable positional embeddings, $E_{\text{pos}} \in \mathbb{R}^{(N+1)\times h}$, are added to obtain the final transformer input matrix, $X_0 \in \mathbb{R}^{(N+1)\times h}$:
+**1: Patch embeddings.**
+We split the image into $N = \frac{H}{P}\frac{W}{P}$ non-overlapping patches of size $P \times P$,
+flatten each patch into a vector in $\mathbb{R}^{P^2C}$,
+and project through a linear layer $W_E \in \mathbb{R}^{(P^2C)\times d}$,
+yielding a patch embedding matrix $\tilde X$.
 
-$$
-X_0
-=
-\tilde X_{\text{patch}} + E_{\text{pos}},
-$$
+**2: CLS token.**
+We prepend a learnable CLS token $x_{\text{cls}} \in \mathbb{R}^{1\times d}$ to the sequence:
+$X = [x_{\text{cls}};\, \tilde X]$.
 
-The positional embeddings encode spatial information about patch locations.
-In the original ViT formulation, these embeddings are simply initialized randomly and learned through gradient descent (see [Appendix A](#pos-embeddings) for variants).
+**3: Positional embeddings.**
+We inject spatial information by adding learnable positional embeddings
+$X_{\text{pos}} \in \mathbb{R}^{(N+1)\times d}$ : $X_0 = X + X_{\text{pos}}$.
+(See [Appendix A](#pos-embeddings) for variants.)
 :::
 
 ---
 
-::: {.callout-note collapse="true" icon="false" title="Self-Attention"}
-The transformer processes the token matrix through a sequence of layers:
+::: {.callout-note collapse="true" icon="false" title="Transformer blocks"}
+$X_0$ is then passed through $L$ transformer blocks, each preserving the matrix shape:
 
 $$
-X_0 \rightarrow X_1 \rightarrow \cdots \rightarrow X_L,
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{X_0}
+\xrightarrow{\text{block}_1}
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{X_1}
+\xrightarrow{\text{block}_2}
+\cdots
+\xrightarrow{\text{block}_L}
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{X_L}
 $$
 
-while preserving the same shape throughout, $X_\ell \in \mathbb{R}^{(N+1)\times h}$.
-
-The key operation is self-attention.
-Given an input token matrix $X$, the model computes learned projections $Q=XW_Q$, $K=XW_K$, and $V=XW_V$, where $W_Q,W_K,W_V \in \mathbb{R}^{h\times h}$.
-This produces $Q,K,V \in \mathbb{R}^{(N+1)\times h}$.
-
-Importantly, the learnable parameters are the projection matrices $W_Q,W_K,W_V$.
-The matrices $Q,K,V$ themselves are activations computed from the current input image.
-
-Attention is then computed via
+Each block applies two sub-operations in sequence, each wrapped in a residual connection:
 
 $$
-\mathrm{Attn}(X)
-=
-\mathrm{softmax}\left(\frac{QK^\top}{\sqrt d}\right)V.
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{X_\ell}
+\;\xrightarrow{\;\mathrm{LN}+\mathrm{MHSA}+\mathrm{skip}\;}\;
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{Y_\ell}
+\;\xrightarrow{\;\mathrm{LN}+\mathrm{MLP}+\mathrm{skip}\;}\;
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{X_{\ell+1}}
 $$
 
-Here, the matrix $QK^\top \in \mathbb{R}^{(N+1)\times(N+1)}$
-contains affinities between all token pairs.
-This allows every patch to directly exchange information with every other patch.
-The attention output $\mathrm{Attn}(X)$ is a weighted combination of value vectors.
-For a token $i$, the output is $\sum_j \alpha_{ij} v_j$, where:
-$v_j$ is the value vector of token $j$, and
-$\alpha_{ij}$ is the attention weight between tokens $i$ and $j$.
-Each token representation thus becomes a dynamically computed mixture of information from other tokens in the image.
+$$
+Y_\ell = X_\ell + \mathrm{MHSA}(\mathrm{LN}(X_\ell)), \qquad X_{\ell+1} = Y_\ell + \mathrm{MLP}(\mathrm{LN}(Y_\ell))
+$$
+
+- **[MHSA](#mhsa)** is multi-head self-attention. It mixes information across tokens.
+- **MLP** is a multi-layer perceptron. It mixes information within each token: e.g. $d \rightarrow 4d \rightarrow d$ with [GELU](https://arxiv.org/pdf/1606.08415) activation.
+- **LN** is layer normalization. It normalizes each token's feature vector.
+- **Skip connections** preserve gradient flow and let information bypass each sub-operation, if required.
 :::
+
+<span id="mhsa"></span>
 
 ---
 
-::: {.callout-note collapse="true" icon="false" title="Multi-Head Attention"}
-Rather than using a single attention operation, Vision Transformers use multi-head attention (MHA).
+::: {.callout-note collapse="true" icon="false" title="Multi-Head Self-Attention"}
+The key operation in each transformer block is self-attention: each token queries all other tokens to gather relevant information, then updates its own representation as a weighted mixture of their values. We first describe the single-head case, then extend to multi-head self-attention.
 
-The embedding dimension is split into multiple heads:
-$h = md$,
-where $m$ = number of attention heads, and $d$ = dimension per head.
-Each head independently performs attention in $\mathbb{R}^d$.
-The resulting head outputs $H_i \in \mathbb{R}^{(N+1)\times d}$
-are concatenated:
+**Self-attention.**
+Given a token matrix $X \in \mathbb{R}^{(N+1)\times d}$, we first project it into queries, keys, and values:
 
 $$
-[H_1;\dots;H_m]
-\in
-\mathbb{R}^{(N+1)\times h}.
+Q = XW_Q, \quad K = XW_K, \quad V = XW_V,
+\qquad W_Q, W_K, W_V \in \mathbb{R}^{d\times d}
 $$
 
-A final learned projection $W_O \in \mathbb{R}^{h\times h}$ mixes information across heads.
+Then we compute attention:
 
-Empirically, different heads often learn different relational structures:
-some focus on local neighborhoods, others on long-range interactions or semantic structure.
-One interpretation is that multiple heads allow the model to learn several distinct token-to-token affinity structures simultaneously.
+$$
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{Q,\;K,\;V}
+\;\xrightarrow{\;\mathrm{softmax}(QK^\top/\sqrt{d})\;}\;
+\underset{\rule{0pt}{1.5ex}(N+1)\times(N+1)}{\alpha}
+\;\xrightarrow{\;\alpha V\;}\;
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{\mathrm{A}(X)}
+$$
+
+$QK^\top$ contains pairwise affinities between all token pairs.
+$\alpha_{jk}$ is how much token $j$ attends to token $k$.
+The output for token $j$ is $\sum_k \alpha_{jk} v_k$, a weighted mixture of all tokens' value vectors.
+
+**Multi-head self-attention.**
+A single SA head computes one set of affinities, capturing one relational structure across the sequence.
+MHSA runs $m$ heads in parallel, each attending in its own $d_{\text{head}}$-dimensional subspace where $d_{\text{head}} = d/m$:
+
+$$
+Q_i = XW_Q^i, \quad K_i = XW_K^i, \quad V_i = XW_V^i,
+\qquad W_Q^i,\, W_K^i,\, W_V^i \in \mathbb{R}^{d\times d_{\text{head}}}
+$$
+
+Every head sees the same $X$, but projects it through its own learned matrices into a lower-dimensional subspace. Each head then runs SA independently:
+
+$$
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{X}
+\;\xrightarrow{\;W_Q^i,\,W_K^i,\,W_V^i\;}\;
+\underset{\rule{0pt}{1.5ex}(N+1)\times d_{\text{head}}}{Q_i,\,K_i,\,V_i}
+\;\xrightarrow{\;\mathrm{SA}\;}\;
+\underset{\rule{0pt}{1.5ex}(N+1)\times d_{\text{head}}}{\mathrm{A}_i(X)}
+\quad\forall\,i
+$$
+
+The $m$ outputs are concatenated and projected through $W_O \in \mathbb{R}^{d\times d}$:
+
+$$
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{[\mathrm{A}_1(X)\;|\;\cdots\;|\;\mathrm{A}_m(X)]}
+\;\xrightarrow{\;W_O\;}\;
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{\mathrm{MHSA}(X)}
+$$
+
+Empirically, different heads learn different relational structures: some attend locally, others to long-range or semantic patterns.
 :::
-
----
-
-::: {.callout-note collapse="true" icon="false" title="Transformer Blocks"}
-Each transformer block combines:
-layer normalization,
-multi-head attention,
-residual connections, and
-a feedforward MLP.
-
-The block structure is
-
-$$
-Y_\ell
-=
-X_\ell + \mathrm{MHA}(\mathrm{LN}(X_\ell)),
-$$
-
-followed by
-
-$$
-X_{\ell+1}
-=
-Y_\ell + \mathrm{MLP}(\mathrm{LN}(Y_\ell)).
-$$
-
-LayerNorm acts independently on each token across its feature dimension $h$.
-
-The MLP also acts independently on each token, typically using $h \rightarrow 4h \rightarrow h$,
-with [GELU](https://arxiv.org/pdf/1606.08415) activation.
-
-Attention mixes information across tokens, while the MLP mixes information within the features of a token.
-By repeatedly alternating these operations, the model builds increasingly abstract visual representations across layers.
-Finally, the CLS token from the final layer is passed to a classifier head for prediction.
-:::
-
-:::
-
----
-
-::: {.callout-note collapse="true" icon="false" title="2. Self-Supervised Pre-training and Parameter Efficient Fine-Tuning"}
-
-Modern Vision Transformers are typically pretrained at massive scale using self-supervised learning (SSL) methods such as [DINO](https://arxiv.org/abs/2104.14294), [MAE](https://arxiv.org/abs/2111.06377), or CLIP-style contrastive learning.
-Rather than learning from manually annotated labels, these approaches train models to produce consistent semantic representations across multiple augmented views of the same image.
-
-Large-scale SSL pre-training substantially improves representation quality and transfer performance across downstream tasks.
-However, these pretrained ViTs often contain hundreds of millions of parameters, making full fine-tuning computationally expensive.
-
----
-
-::: {.callout-note collapse="true" icon="false" title="Parameter Counts"}
-
-To understand the scale of modern Vision Transformers, consider a transformer block with embedding dimension $h$.
-For example, DINOv3-Large uses $h = 1024$.
-
-The attention projection matrices in each transformer block are $W_Q,W_K,W_V,W_O \in \mathbb{R}^{h\times h}$.
-Each therefore contains $h^2$ parameters.
-
-For DINOv3-Large:
-
-$$
-h^2 = 1024^2 \approx 1\text{M}
-$$
-
-parameters per matrix.
-
-Since multi-head attention contains four such matrices, the total attention parameter count per transformer block is
-
-$$
-4h^2 \approx 4\text{M}.
-$$
-
-The feedforward MLP typically uses $h \rightarrow 4h \rightarrow h$, giving parameter count
-
-$$
-h(4h) + (4h)h = 8h^2 \approx 8\text{M}.
-$$
-
-DINOv3-Large contains 24 transformer blocks, yielding approximately
-
-$$
-24 \times 12\text{M}
-\approx
-288\text{M}
-$$
-
-parameters in the transformer stack alone.
 
 :::
 
 ---
 
-::: {.callout-note collapse="true" icon="false" title="Low-Rank Adaptation (LoRA)"}
+::: {.callout-note collapse="true" icon="false" title="2. Pretraining and Fine-Tuning"}
 
+Directly training a ViT for a specific task using supervised learning rarely works well. These models are [large](#param-counts) and lack regularizing inductive biases, so they need an enormous amount of labelled data to learn useful representations.
 
-Large Vision Transformers are often adapted to downstream tasks using Low-Rank Adaptation (LoRA).
+In practice, ViTs are pretrained at scale on large unlabelled datasets using self-supervised learning methods such as contrastive learning ([DINO](https://arxiv.org/abs/2104.14294), [CLIP](https://arxiv.org/abs/2103.00020)) or masked image modelling ([MAE](https://arxiv.org/abs/2111.06377)). Dataset and model sizes have grown rapidly: [DINOv2](https://arxiv.org/abs/2304.07193) was trained on ~142M curated images with a 1.1B parameter model, and [DINOv3](https://arxiv.org/abs/2508.10104) scaled this to ~1.7B images with a 6.7B parameter model. These models produce strong general-purpose representations that transfer well across downstream tasks.
 
-Suppose a pretrained projection matrix is $W \in \mathbb{R}^{h\times h}$.
-Rather than updating the full matrix during fine-tuning, LoRA freezes $W$ and learns a low-rank update:
+For task-specific adaptation, fully fine-tuning all parameters is prone to overfitting.
+[LoRA](#lora) addresses this by freezing the pretrained weights and
+learning a small number of low-rank updates instead,
+making fine-tuning tractable with far fewer trainable parameters.
 
-$$
-W' = W + BA,
-$$
+---
 
-where
+::: {#param-counts .callout-note collapse="true" icon="false" title="Parameter Counts"}
 
-$$
-A \in \mathbb{R}^{r\times h},
-\qquad
-B \in \mathbb{R}^{h\times r},
-$$
-
-with rank $r \ll h$.
-
-The low-rank update therefore contains only $2hr$ learnable parameters rather than the full $h^2$.
-
-LoRA is commonly applied to the attention projection matrices $W_Q$, $W_K$, $W_V$, and $W_O$, though many implementations adapt only a subset of these.
-
-Suppose LoRA uses rank $r=8$ and adapts all four attention projection matrices in each transformer block.
-For a single matrix, LoRA learns
+To get a sense of the scale of modern ViTs, consider a transformer block with embedding dimension $d$.
+DINOv3-Large uses $d = 1024$ across $L = 24$ blocks.
+Each transformer block has two main parameter contributions.
+In practice, $W_Q, W_K, W_V$ each implement all attention heads combined as a single $d\times d$ matrix (equivalent to stacking the per-head matrices
+$W_Q^i \in \mathbb{R}^{d \times d_\text{head}}$ across $m$ heads),
+so MHSA contributes four $d\times d$ matrices: $W_Q$, $W_K$, $W_V$, $W_O$.
+The MLP contributes two matrices: $W_1 \in \mathbb{R}^{d\times 4d}$ and $W_2 \in \mathbb{R}^{4d\times d}$.
 
 $$
-2hr = 2(1024)(8) \approx 16\text{k}
+\underbrace{W_Q,\,W_K,\,W_V,\,W_O \in \mathbb{R}^{d\times d}}_{\text{MHSA: }\; 4d^2 \approx 4\text{M}}
+\qquad\qquad
+\underbrace{W_1 \in \mathbb{R}^{d\times 4d},\; W_2 \in \mathbb{R}^{4d\times d}}_{\text{MLP: }\; 2 \times 4d^2 = 8d^2 \approx 8\text{M}}
 $$
 
-trainable parameters instead of
+Thus, per block, we have: $4d^2 + 8d^2 = 12d^2 \approx 12\text{M}$ (at $d = 1024$).
+Scaling to the full model, we have:
 
 $$
-h^2 \approx 1\text{M}.
+\underbrace{24 \times 12\text{M}}_{\text{transformer stack}} \;+\; \underbrace{\approx 12\text{M}}_{\text{LN, biases, emb.}} \;=\; \underbrace{\;\approx\;300\text{M}}_{\text{Total}}
 $$
 
-Applying LoRA to all four attention projections across all 24 transformer blocks therefore introduces approximately
+The DINOv3-7B model has 6.7B params by using $d = 4096$ and $L = 40$ blocks
+(total param count scales as $L \cdot d^2$).
+
+:::
+
+---
+
+::: {#lora .callout-note collapse="true" icon="false" title="Low-Rank Adaptation (LoRA)"}
+
+Full fine-tuning is expensive when the model has hundreds of millions of parameters.
+[LoRA](https://arxiv.org/abs/2106.09685) keeps the pretrained weights frozen and learns a small low-rank correction instead.
+For a pretrained projection matrix $W \in \mathbb{R}^{d\times d}$,
+LoRA introduces matrices $B \in \mathbb{R}^{d\times r}$ and $A \in \mathbb{R}^{r\times d}$ with rank $r \ll d$.
+During fine-tuning and inference, $W$ is replaced by the adapted weight $W'$:
 
 $$
-24 \times 4 \times 16\text{k}
-\approx
-1.6\text{M}
+W' = \underbrace{W}_{\substack{d\times d \\ \text{frozen}}} + \underbrace{BA}_{\substack{d\times d,\;\text{rank-}r \\ \text{trainable}}}
 $$
 
-trainable parameters total.
-
-Thus, LoRA updates only approximately
+The update $BA$ has $2dr$ trainable params, compared to $d^2$ for the full matrix. For DINOv3-Large ($d = 1024$, $r = 8$):
 
 $$
-\frac{1.6}{288}
-\approx
-0.56\%
+\underbrace{d^2 \approx 1\text{M}}_{\text{full fine-tuning}} \quad\longrightarrow\quad \underbrace{2dr = 2(1024)(8) \approx 16\text{k}}_{\text{LoRA, rank-}8}
 $$
 
-of the model parameters.
-
-This large reduction in trainable parameters substantially lowers memory usage and optimization cost during fine-tuning while often preserving strong downstream performance.
+LoRA is commonly applied to the attention projection matrices $W_Q, W_K, W_V, W_O$, though many implementations adapt only a subset.
+Applying rank-8 LoRA to all four attention matrices across all 24 blocks:
+$24 \times 4 \times 16\text{k} \approx 1.6\text{M}$ total trainable parameters.
+This is about $1.6/300 \approx 0.5\%$ of the full model.
+The small number of trainable parameters lowers memory and optimization cost, 
+and also limits how far the model can drift from its pretrained initialization, which helps avoid overfitting on small datasets.
 
 :::
 :::
 
 ---
 
-::: {.callout-note collapse="true" icon="false" title="3. Scaling and Practical Constraints"}
+::: {.callout-note collapse="true" icon="false" title="3. Downstream Tasks"}
 
-Self-attention scales quadratically with the number of tokens, imposing practical constraints on resolution and computational cost.
-LoRA reduces the number of trainable parameters during fine-tuning, but the dominant memory cost during training often comes from activations rather than weights.
+A pretrained ViT backbone produces token representations $X_L \in \mathbb{R}^{(N+1)\times d}$ that transfer well to many downstream tasks. Which part of $X_L$ to use depends on what the task requires:
+
+$$
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^{H\times W\times C}}{x}
+\xrightarrow{\text{tokenize}}
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{X_0}
+\xrightarrow{L\text{ blocks}}
+\underset{\rule{0pt}{1.5ex}(N+1)\times d}{X_L}
+$$
+
+$$
+\underset{\text{global}}{X_L[0]}
+\;\xrightarrow{\;\text{linear head}\;}\;
+\text{class label}
+\qquad\qquad
+\underset{\text{spatial}}{X_L[1:]}
+\;\xrightarrow{\;\text{reshape + decode}\;}\;
+\text{dense output}
+$$
+
+---
+
+::: {.callout-note collapse="true" icon="false" title="Image Classification"}
+For classification, we need a single vector that summarizes the whole image. The CLS token $X_L[0]$ serves this role: having attended to all patch tokens across all $L$ layers, it accumulates global context. A linear classifier is applied on top for prediction.
+:::
+
+---
+
+::: {.callout-note collapse="true" icon="false" title="Dense Prediction"}
+Tasks such as semantic segmentation, object detection and depth estimation require dense spatial predictions rather than a single label.
+Patch tokens $X_L[1:] \in \mathbb{R}^{N\times d}$ retain spatial structure through their positional embeddings, but at low resolution ($H/P \times W/P$).
+A common strategy is to reshape them back to a spatial grid and upsample with a convolutional decoder:
+
+$$
+X_L[1:] \in \mathbb{R}^{N\times d}
+\;\rightarrow\;
+\mathbb{R}^{H/P \times W/P \times d}
+\;\xrightarrow{\;\text{decoder}\;}\;
+\text{dense prediction}
+$$
+
+**Hierarchical Transformers**
+
+Vanilla ViTs produce a single-scale feature map and do not naturally support the multi-scale representations that CNNs provide through pooling and strided convolutions.
+This can be a limitation for dense prediction tasks, where coarse-to-fine hierarchies are useful.
+
+Hierarchical transformer architectures address this directly.
+One influential example is the [Swin Transformer](https://arxiv.org/abs/2103.14030),
+which restricts attention to local windows, progressively merges patches across layers, and constructs multi-scale feature pyramids similar to CNN hierarchies.
+These designs improve computational efficiency and produce richer representations for dense spatial tasks.
+
+:::
+
+---
+
+:::
+
+---
+
+
+::: {.callout-note collapse="true" icon="false" title="4. Memory and Scaling"}
+
+Two practical constraints arise when using ViTs at scale: self-attention is quadratic in token count (limiting feasible resolutions and 3D volume sizes), and training memory is dominated by activations rather than weights (limiting how much LoRA's parameter reduction helps).
 
 ---
 
 ::: {.callout-note collapse="true" icon="false" title="Attention Complexity"}
-For an image of size $H \times W$ with patch size $P$, the number of patch tokens is
+For an image of size $H \times W$ with patch size $P$, the number of patch tokens is $N = \frac{H}{P}\frac{W}{P}$. Self-attention computes pairwise dot products between all token pairs, producing an $(N+1)\times(N+1)$ attention matrix where each entry involves a $d$-dimensional dot product. Attention complexity therefore scales as:
 
 $$
-N = \frac{H}{P}\frac{W}{P}.
+\mathcal{O}(N^2 d).
 $$
 
-Self-attention computes pairwise interactions between all tokens, producing an attention matrix of size
-
-$$
-QK^\top \in \mathbb{R}^{(N+1)\times(N+1)}.
-$$
-
-As a result, attention complexity scales approximately quadratically with token count:
-
-$$
-\mathcal{O}(N^2 h).
-$$
-
-This scaling behavior explains why Vision Transformers typically use relatively large patch sizes such as $P=16$.
+This is why ViTs typically use large patch sizes such as $P=16$.
 Reducing patch size increases spatial resolution but also dramatically increases attention cost.
-
-For example, a $224 \times 224$ image with patch size $16$ produces
-
-$$
-14 \times 14 = 196
-$$
-
-patch tokens.
-
-Increasing resolution to $512 \times 512$ yields
-
-$$
-32 \times 32 = 1024
-$$
-
-tokens, increasing attention cost by approximately
-
-$$
-\left(\frac{1024}{196}\right)^2 \approx 27\times.
-$$
+A $224\times224$ image at $P=16$ gives $14\times14 = 196$ tokens;
+at $512\times512$ this grows to $32\times32 = 1024$ tokens,
+a $(1024/196)^2 \approx 27\times$ increase in attention cost.
 :::
 
 ---
 
 ::: {.callout-note collapse="true" icon="false" title="Practical Strategies for 3D Inputs"}
-These scaling constraints become particularly important in medical imaging.
+These constraints become particularly important in medical imaging.
 A typical 3D MRI or CT volume may contain hundreds of slices, making fully 3D transformers computationally expensive.
-
-One common practical strategy is to apply a pretrained 2D Vision Transformer independently to individual slices or views.
-The resulting slice-level representations can then be fused using temporal pooling, recurrent models, cross-slice attention, or lightweight fusion transformers.
-
-For example, a pretrained DINOv3-Large encoder can produce semantic embeddings for each 2D slice, while a smaller downstream model aggregates information across the full 3D volume.
-
-This hybrid strategy often provides a useful tradeoff between representation quality, memory efficiency, and computational cost.
-
-Importantly, LoRA reduces the number of trainable parameters during adaptation, but does not significantly reduce activation memory.
-Large batch sizes and high-resolution inputs therefore remain constrained primarily by attention activations rather than parameter storage alone.
+One common strategy is to apply a pretrained 2D ViT independently to individual slices or views.
+The resulting slice-level representations can then be fused using lightweight fusion transformers.
+This hybrid approach often provides a good tradeoff between representation quality,
+memory efficiency, and computational cost.
 :::
 
 ---
 
 ::: {.callout-note collapse="true" icon="false" title="GPU Memory in Practice"}
-As a rough practical reference, fine-tuning a DINOv3-Large backbone with LoRA ($r=8$) on a single 48GB GPU typically allows batch sizes on the order of $\sim 32$–$64$ images for standard 2D inputs such as $224\times224$, and substantially smaller effective batch sizes for high-resolution medical images or multi-slice fusion pipelines.
-
-For high-resolution or volumetric medical imaging, memory consumption is therefore driven much more strongly by image resolution, number of tokens, number of slices/views, and intermediate activations, than by the number of trainable LoRA parameters themselves.
+As a rough guide, fine-tuning a DINOv3-Large backbone with LoRA ($r=8$) on a single 48GB GPU
+allows batch sizes of ~32--64 images at $224\times224$,
+and substantially smaller batches for high-resolution or volumetric inputs.
+Despite LoRA reducing trainable parameters to ~0.5%,
+the dominant memory cost during training comes from intermediate attention activations,
+not from the parameters themselves.
+Increasing LoRA rank therefore has little effect on peak memory,
+but increasing image resolution or adding 3D slices has a large one.
 :::
-
-:::
-
----
-
-::: {.callout-note collapse="true" icon="false" title="4. Extensions to Dense Prediction"}
-
-Vanilla Vision Transformers were originally developed for image classification, but many tasks require dense spatial predictions.
-Two key challenges arise: recovering spatial resolution from patch tokens, and producing multi-scale feature hierarchies.
-
----
-
-::: {.callout-note collapse="true" icon="false" title="Decoding Patch Tokens for Dense Prediction"}
-Many computer vision tasks require dense spatial predictions rather than a single class label, such as semantic segmentation, object detection, depth estimation, and medical image segmentation.
-
-A key challenge is that ViTs operate on a sequence of patch embeddings rather than dense pixel grids.
-Although the patch tokens retain spatial structure implicitly through positional embeddings, the native transformer output is relatively low-resolution.
-
-One simple strategy is to reshape the final patch embeddings back into a spatial grid:
-
-$$
-X_L \in \mathbb{R}^{N\times h}
-\quad \rightarrow \quad
-\mathbb{R}^{H/P \times W/P \times h}.
-$$
-
-A convolutional decoder can then progressively upsample these representations to recover dense pixel-level predictions.
-This approach is commonly used in hybrid ViT-U-Net architectures for medical imaging and semantic segmentation.
-:::
-
----
-
-::: {.callout-note collapse="true" icon="false" title="Hierarchical Transformers"}
-Vanilla ViTs do not naturally produce multi-scale feature hierarchies in the way CNNs do.
-Convolutional networks progressively build representations at multiple spatial resolutions through pooling and strided convolutions, which is particularly useful for dense prediction tasks.
-
-Several hierarchical transformer architectures were therefore developed to address this limitation.
-One influential example is the [Swin Transformer](https://arxiv.org/abs/2103.14030), which restricts attention to local windows, progressively merges patches across layers, and constructs multi-scale feature pyramids similar to CNN hierarchies.
-
-These hierarchical designs substantially improve computational efficiency while producing representations better suited for dense spatial prediction tasks.
-
-More generally, patch token representations learned by Vision Transformers can be reused across a wide range of downstream tasks, including classification, segmentation, retrieval, detection, and multimodal representation learning.
-
-This transferability is one reason large self-supervised ViTs such as DINO have become widely adopted foundation models for computer vision.
-:::
-
 
 :::
 
@@ -389,20 +329,25 @@ This transferability is one reason large self-supervised ViTs such as DINO have 
 
 ::: {.callout-note collapse="true" icon="false" title="5. Appendix A: Positional Embedding Variants"}
 
-Self-attention is permutation-invariant: without additional structure, the transformer cannot distinguish whether two patch embeddings originate from nearby or distant image regions.
-Positional embeddings inject spatial information into the token sequence, and several variants have been developed that trade off resolution generalization, inductive structure, and computational efficiency.
+Self-attention is permutation-invariant:
+without additional structure, the transformer cannot distinguish whether two patch embeddings originate from nearby or distant image regions.
+Positional embeddings inject spatial information into the token sequence.
+Several variants have been developed that trade off resolution generalization,
+inductive structure, and computational efficiency.
 
 ---
 
 ::: {.callout-note collapse="true" icon="false" title="Learned Absolute Positional Embeddings"}
-Vanilla ViTs learn a parameter matrix $E_{\text{pos}} \in \mathbb{R}^{(N+1)\times h}$ with one embedding vector per patch location, added to the input token matrix:
+Vanilla ViTs learn a parameter matrix $X_{\text{pos}} \in \mathbb{R}^{(N+1)\times d}$
+with one embedding vector per patch location, added to the input token matrix:
 
 $$
-X_0 = \tilde X_{\text{patch}} + E_{\text{pos}}.
+X_0 = X + X_{\text{pos}}.
 $$
 
 This approach is simple and effective, but ties the model to a fixed input resolution.
-Changing image size changes the number of patch tokens $N$, requiring positional embedding interpolation during transfer to new resolutions.
+Changing image size changes the number of patch tokens $N$,
+requiring positional embedding interpolation during transfer to new resolutions.
 :::
 
 ---
@@ -413,31 +358,35 @@ Transformers in NLP originally used deterministic sinusoidal embeddings:
 $$
 \mathrm{PE}(p,2i)
 =
-\sin\left(\frac{p}{10000^{2i/h}}\right),
+\sin\left(\frac{p}{10000^{2i/d}}\right),
 \qquad
 \mathrm{PE}(p,2i+1)
 =
-\cos\left(\frac{p}{10000^{2i/h}}\right).
+\cos\left(\frac{p}{10000^{2i/d}}\right).
 $$
 
 These embeddings require no learned parameters and naturally generalize to longer sequences.
-However, learned embeddings typically perform better in Vision Transformers.
+However, learned embeddings typically perform better in ViTs.
 :::
 
 ---
 
 ::: {.callout-note collapse="true" icon="false" title="Relative Positional Embeddings"}
-[Relative positional embeddings](https://arxiv.org/abs/1803.02155) encode relative spatial offsets between tokens rather than absolute patch locations.
-This allows attention to depend on relationships such as "one patch above" or "two patches left", rather than fixed grid coordinates.
-Relative positional embeddings often improve transfer across resolutions and are widely used in hierarchical architectures such as Swin Transformers.
+[Relative positional embeddings](https://arxiv.org/abs/1803.02155) encode relative spatial offsets
+between tokens rather than absolute patch locations.
+This allows attention to depend on relationships such as "one patch above" or "two patches left",
+rather than fixed grid coordinates.
+Relative positional embeddings often improve transfer across resolutions and are widely used.
 :::
 
 ---
 
 ::: {.callout-note collapse="true" icon="false" title="Rotary Positional Embeddings (RoPE)"}
-[Rotary positional embeddings (RoPE)](https://arxiv.org/abs/2104.09864) encode position through rotations applied directly to query and key vectors before attention.
-Rather than adding positional vectors to token embeddings, RoPE modifies the geometry of the attention computation itself, producing attention scores that depend naturally on relative token offsets.
-RoPE became particularly popular in large language models, though variants have increasingly been explored for Vision Transformers as well.
+[Rotary positional embeddings (RoPE)](https://arxiv.org/abs/2104.09864) encode position through rotations
+applied directly to query and key vectors before attention.
+Rather than adding positional vectors to token embeddings,
+RoPE modifies the geometry of the attention computation itself,
+producing attention scores that depend naturally on relative token offsets.
 :::
 
 :::
