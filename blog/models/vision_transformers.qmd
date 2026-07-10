@@ -1,10 +1,12 @@
 ---
-title: "Intro to Vision Transformers"
-description: ""
+title: "Vision Transformers"
+description: "Intro to ViT architecture and fine-tuning pretrained ViTs for downstream tasks."
 categories: [Deep Learning]
 ---
 
-[Vision Transformers](https://arxiv.org/abs/2010.11929) (ViTs) adapt the [transformer](https://arxiv.org/abs/1706.03762) architecture from natural language processing to images.
+[Vision Transformers](https://arxiv.org/abs/2010.11929) (ViTs)
+adapt the [transformer](https://arxiv.org/abs/1706.03762) architecture from natural language processing
+to image processing.
 In this note, let's discuss the architecture of these models,
 their pretraining and fine-tuning,
 usage for downstream tasks,
