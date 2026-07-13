@@ -23,6 +23,13 @@ listing:
     fields: [title, description]
     filter-ui: false
     sort-ui: false
+  - id: learning
+    contents: "learning/*.qmd"
+    type: grid
+    grid-columns: 1
+    fields: [title, description]
+    filter-ui: false
+    sort-ui: false
 ---
 
 <div class="posts-listing-page">
@@ -40,6 +47,11 @@ listing:
 ## Stats
 
 ::: {#stats}
+:::
+
+## Learning
+
+::: {#learning}
 :::
 
 </div>

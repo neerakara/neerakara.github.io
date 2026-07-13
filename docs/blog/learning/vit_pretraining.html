@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Notes on contrastive learning, self-distillation, and masked prediction.">
+
+<title>Self-Supervised Representation Learning in Vision – Neerav Karani</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Neerav Karani</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Self-Supervised Representation Learning in Vision</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Learning</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Notes on contrastive learning, self-distillation, and masked prediction.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A visual encoder maps images to feature vectors; what those vectors <em>contain</em> is determined by training. Supervised training shapes representations to predict a fixed label set, which works well within the training distribution but limits what the representations capture. Self-supervised learning (SSL) sidesteps labels entirely, learning representations directly from the structure of images. This note covers the three main SSL principles: contrastive learning, self-distillation, and masked prediction.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="1. Motivation">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Motivation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The standard approach to pretraining visual encoders is supervised pretraining on a large labelled dataset (e.g., ImageNet-21k), followed by fine-tuning on a target task. This works well when the target task is visually similar to the pretraining labels. It has two structural limitations.</p>
+<p>First, labels are expensive. In domains like medical imaging, curating a large labelled dataset requires significant expert effort. Unlabelled data is far more accessible: medical archives, internet images, and domain-specific collections can easily reach millions of examples.</p>
+<p>Second, labels impose a particular partitioning of the visual world. A classifier trained on ImageNet learns representations that are useful for distinguishing among ImageNet categories. Those representations encode the features that vary across those categories, which may not be the features most useful for a different task. SSL does not optimize for any specific label set; it learns the general structure of the visual world.</p>
+<p>ViTs are particularly well suited to SSL. Unlike CNNs, they lack strong inductive biases (local connectivity, spatial equivariance), so they require large amounts of data to learn useful structure. That same flexibility means they can learn rich, general-purpose representations when trained on diverse unlabelled data. <a href="https://arxiv.org/abs/2304.07193">DINOv2</a> was trained on ~142M curated images with a 1.1B parameter model; <a href="https://arxiv.org/abs/2508.10104">DINOv3</a> scaled this to ~1.7B images with a 6.7B parameter model. Both demonstrate that a single SSL-pretrained encoder can support diverse downstream tasks without task-specific retraining.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="2. What Is a Good Representation?">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What Is a Good Representation?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Before asking <em>how</em> to learn without labels, it helps to ask <em>what</em> we want to learn. A representation is a function <span class="math inline">\(f_\theta\)</span> that maps an image <span class="math inline">\(x \in \mathbb{R}^{H \times W \times C}\)</span> to a feature vector <span class="math inline">\(z \in \mathbb{R}^d\)</span>:</p>
+<p><span class="math display">\[
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^{H\times W\times C}}{x}
+\;\xrightarrow{\;f_\theta\;}\;
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^d}{z}
+\]</span></p>
+<p>A useful framing from <a href="https://arxiv.org/abs/1206.5538">a seminal review of representation learning</a> is that images are generated by a small number of underlying <em>factors of variation</em>: identity, pose, disease state, lighting. A good representation <span class="math inline">\(z\)</span> should disentangle these factors from one another and from irrelevant surface statistics. This motivates four concrete properties.</p>
+<p><strong>Semantic.</strong> Images with similar content should map to nearby points in <span class="math inline">\(\mathbb{R}^d\)</span>. A chest X-ray with pneumonia should be closer to other pneumonia cases than to normal scans.</p>
+<p><strong>Invariant.</strong> The representation should be insensitive to changes that do not affect semantics: lighting, viewpoint, color, slight cropping. These are <em>nuisance factors</em>: they change pixels but not meaning.</p>
+<p><strong>Discriminative.</strong> Images with different semantic content should be far apart. Invariance alone is not enough; the trivial solution of mapping everything to zero is perfectly invariant but useless.</p>
+<p><strong>Transferable.</strong> The features should be reusable across tasks without being retrained from scratch. This favors general structure over task-specific detail.</p>
+<p>These four properties define the target. The three SSL methods in Section 4 each pursue them from a different angle.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="3. The Self-Supervised Setup">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The Self-Supervised Setup
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The core insight behind visual SSL is that a single image can be transformed in many ways that preserve its semantic content. A crop of a dog is still a dog. A color-jittered chest X-ray still shows the same anatomy.</p>
+<p>Given an image <span class="math inline">\(x\)</span>, we sample two augmented views by drawing two stochastic transformations <span class="math inline">\(t_1, t_2\)</span> from an augmentation distribution <span class="math inline">\(\mathcal{T}\)</span>:</p>
+<p><span class="math display">\[
+x_1 = t_1(x), \qquad x_2 = t_2(x), \qquad t_1, t_2 \sim \mathcal{T}
+\]</span></p>
+<p>Each <span class="math inline">\(t_i\)</span> applies a random combination of operations such as random resized crop, horizontal flip, color jitter, grayscale, and Gaussian blur. We call <span class="math inline">\((x_1, x_2)\)</span> a <em>positive pair</em>: same semantic content, different appearance. The learning signal comes entirely from this structure: a good encoder should map <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> to nearby representations. Images from different sources are <em>negatives</em>; their representations should be far apart.</p>
+<p>The choice of augmentations matters. Augmentations that are too weak allow the encoder to distinguish views using low-level cues (brightness, texture) rather than learning semantic content. Augmentations that are too strong destroy the semantic signal and make the task impossible. In practice, random resized crops with large scale variation are the most important component: they force the encoder to recognize content at different spatial extents.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="4. Three Ways to Learn Without Labels">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Three Ways to Learn Without Labels
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The self-supervised setup provides a training signal: views of the same image should produce similar representations. Methods differ in how they enforce this.</p>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="A. Contrastive Learning">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>A. Contrastive Learning
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Idea.</strong> Pull the representations of positive pairs together; push the representations of negative pairs apart.</p>
+<p>Given views <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span>, we pass each through the encoder <span class="math inline">\(f_\theta\)</span> followed by a small projection head <span class="math inline">\(g_\phi\)</span>, then <span class="math inline">\(\ell_2\)</span>-normalize to get unit vectors <span class="math inline">\(z_1, z_2 \in \mathbb{R}^d\)</span>:</p>
+<p><span class="math display">\[
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^{H\times W\times C}}{x_i}
+\;\xrightarrow{\;f_\theta\;}\;
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^d}{h_i}
+\;\xrightarrow{\;g_\phi\;}\;
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^d}{p_i}
+\;\xrightarrow{\;\ell_2\text{-norm}\;}\;
+\underset{\rule{0pt}{1.5ex}\|\cdot\|=1}{z_i}
+\]</span></p>
+<p>The loss treats this as a classification problem: given <span class="math inline">\(z_1\)</span>, can the model identify <span class="math inline">\(z_2\)</span> as the positive among <span class="math inline">\(K-1\)</span> negatives? This is the InfoNCE objective (see <a href="#appendix-infonce">Appendix A</a>):</p>
+<p><span class="math display">\[
+\mathcal{L} = -\log \frac{\exp(z_1 \cdot z_2\, /\, \tau)}{\exp(z_1 \cdot z_2\, /\, \tau) \;+\; \sum_{k=1}^{K-1} \exp(z_1 \cdot z_k^-\, /\, \tau)}
+\]</span></p>
+<p>where <span class="math inline">\(\tau\)</span> is a temperature hyperparameter and <span class="math inline">\(z_k^-\)</span> are negative samples. The numerator rewards high similarity between the positive pair; the denominator penalizes high similarity to any negative.</p>
+<p><strong><a href="https://arxiv.org/abs/2002.05709">SimCLR</a></strong> is the canonical vision contrastive method. Within each training batch, all other images serve as negatives. A large batch size, typically 4096 or more, is needed to supply enough negatives for an informative loss.</p>
+<p><strong><a href="https://arxiv.org/abs/2103.00020">CLIP</a></strong> applies the same objective to image-text pairs. Given a batch of <span class="math inline">\(K\)</span> matched (image, text) pairs, two encoders, one for images and one for text, are trained to align matched pairs and separate unmatched ones. CLIP sidesteps augmentation design entirely: the image-text correspondence provides a natural source of positive pairs. The resulting representations support zero-shot classification and cross-modal retrieval.</p>
+<p>Contrastive methods work well but require many negatives. Maintaining large batches or external memory banks adds training complexity. Self-distillation methods, described next, achieve competitive results without explicit negatives.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="B. Self-Distillation">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>B. Self-Distillation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Idea.</strong> Train two networks to agree on their output distributions, where one network is a slowly-updating copy of the other.</p>
+<p>The setup has two networks with the same architecture: a student with parameters <span class="math inline">\(\theta\)</span> and a teacher with parameters <span class="math inline">\(\xi\)</span>. The teacher is not updated by gradient descent. Instead, its weights are an exponential moving average of the student’s weights:</p>
+<p><span class="math display">\[
+\xi \;\leftarrow\; \tau\,\xi \;+\; (1-\tau)\,\theta
+\]</span></p>
+<p>where <span class="math inline">\(\tau\)</span> is a momentum coefficient close to 1 (e.g., 0.996). The teacher is always a slightly older, smoother version of the student.</p>
+<p>Given two views <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span>, the student processes one view and the teacher the other. Both produce a distribution over <span class="math inline">\(K\)</span> prototype dimensions via a softmax with temperature:</p>
+<p><span class="math display">\[
+p_s = \mathrm{softmax}\!\left(\frac{f_\theta(x_1)}{\tau_s}\right),
+\qquad
+p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
+\]</span></p>
+<p>The student is trained to match the teacher’s output by minimizing the cross-entropy <span class="math inline">\(H(p_t,\, p_s)\)</span>, with no gradient flowing through the teacher.</p>
+<p>Without countermeasures, this system collapses: both networks can converge to outputting the same constant distribution for all inputs, reducing the loss to zero without learning anything useful. DINO uses two complementary mechanisms to prevent this.</p>
+<p><strong>Centering</strong> subtracts a running mean <span class="math inline">\(c\)</span> from the teacher output before the softmax. This prevents any single prototype dimension from dominating and biases the teacher toward a spread distribution.</p>
+<p><strong>Sharpening</strong> uses a lower temperature <span class="math inline">\(\tau_t &lt; \tau_s\)</span> for the teacher. A sharper teacher concentrates its output on a small number of dimensions, making the training target informative rather than flat.</p>
+<p>Together, centering and sharpening create a productive tension: centering prevents the collapse where one dimension dominates, and sharpening prevents the collapse where the distribution becomes uniform over all dimensions.</p>
+<p><strong><a href="https://arxiv.org/abs/2006.07733">BYOL</a></strong> established that negatives are not needed: it uses an asymmetric architecture with a prediction head on the student side only, and the EMA teacher, to prevent collapse without centering or sharpening.</p>
+<p><strong><a href="https://arxiv.org/abs/2104.14294">DINO</a></strong> adapts this framework specifically to ViTs. The CLS token output is used as the representation, and multi-crop training is applied: the teacher sees a global crop of the image, while the student sees multiple smaller local crops. A key empirical finding is that DINO attention heads spontaneously learn to segment semantically coherent image regions, with no segmentation supervision. This emergent spatial structure is why DINO features transfer well to dense prediction tasks, and why DINO is the dominant pretraining strategy for ViT-based medical imaging.</p>
+<p><a href="https://arxiv.org/abs/2304.07193">DINOv2</a> extended this with a curated dataset, a masked prediction auxiliary loss, and scaling to 1.1B parameters.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="C. Masked Prediction">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>C. Masked Prediction
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Idea.</strong> Hide part of the input and train the model to predict what is missing.</p>
+<p><strong><a href="https://arxiv.org/abs/2111.06377">MAE</a></strong> (Masked Autoencoders) applies this to ViTs by masking a large fraction of patches (typically 75%) and reconstructing the original pixel values.</p>
+<p>The architecture has two parts. The encoder is a standard ViT that processes only the <em>visible</em> patches. Masking happens before the encoder, so its cost scales with the number of visible tokens <span class="math inline">\(N_\text{vis} = (1 - m) \cdot N\)</span> rather than the full sequence:</p>
+<p><span class="math display">\[
+\underset{\rule{0pt}{1.5ex}\mathbb{R}^{H\times W\times C}}{x}
+\;\xrightarrow{\;\text{patch + mask}\;}\;
+\underset{\rule{0pt}{1.5ex}N_\text{vis}\times d}{X_\text{vis}}
+\;\xrightarrow{\;L\text{ blocks}\;}\;
+\underset{\rule{0pt}{1.5ex}N_\text{vis}\times d}{Z_\text{vis}}
+\]</span></p>
+<p>The decoder takes the encoder output concatenated with learnable mask tokens (one per hidden patch, each with its positional embedding) and reconstructs all <span class="math inline">\(N\)</span> patches:</p>
+<p><span class="math display">\[
+\left[\underset{\rule{0pt}{1.5ex}N_\text{vis}\times d}{Z_\text{vis}};\;\underset{\rule{0pt}{1.5ex}N_\text{mask}\times d}{\text{mask tokens}}\right]
+\;\xrightarrow{\;\text{decoder}\;}\;
+\underset{\rule{0pt}{1.5ex}N\times P^2 C}{\hat{x}}
+\]</span></p>
+<p>The loss is mean squared error between the reconstructed pixel values <span class="math inline">\(\hat{x}\)</span> and the true values, computed only over the masked patches.</p>
+<p>The 75% mask ratio is critical. Low masking ratios allow reconstruction by interpolating from nearby visible patches, which does not require understanding object structure. A 75% mask forces the encoder to reason about global context to fill in large missing regions.</p>
+<p>After pretraining, the decoder is discarded and the encoder is used as a feature extractor. MAE converges faster than DINO but produces somewhat weaker features for dense prediction tasks; DINOv2 combines both objectives to capture the benefits of each.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="5. Why Do These Produce Useful Representations?">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why Do These Produce Useful Representations?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The three methods enforce view consistency through different mechanisms, but the learned representations share two properties that go beyond what the training objective explicitly requires.</p>
+<p><strong>Object-centric structure.</strong> The clearest evidence is in DINO attention maps. At no point during training does the model see segmentation labels, yet at convergence its CLS token attention maps highlight foreground objects, and different attention heads attend to different semantic parts of the scene. This structure is not engineered; it emerges from the requirement to match views that contain the same object but differ in crop and appearance.</p>
+<p><strong>Geometry of the embedding space.</strong> Semantically related inputs cluster together, and the overall distribution of representations spreads uniformly across the hypersphere (see <a href="#appendix-infonce">Appendix A</a> for the alignment and uniformity decomposition).</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="6. Fine-Tuning">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Fine-Tuning
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>After SSL pretraining, the encoder is adapted to a specific task. Four strategies span the tradeoff between cost and performance. (See the <a href="../../blog/models/vision_transformers.html">ViT note</a> for details on LoRA.)</p>
+<p><strong>Frozen encoder + linear probing.</strong> Only a linear classifier head is trained on top of the frozen backbone. This is the fastest option and a standard benchmark for representation quality: a good SSL representation should be linearly separable for most tasks.</p>
+<p><strong>Frozen encoder + nonlinear head.</strong> A small MLP head replaces the linear classifier, allowing more flexible adaptation without touching the backbone.</p>
+<p><strong>LoRA fine-tuning.</strong> The backbone is frozen; small low-rank update matrices are added to the attention projections and trained alongside the task head. This gives more flexibility than a fixed head while keeping trainable parameters below 1% of the backbone.</p>
+<p><strong>Full fine-tuning.</strong> All parameters are updated. Most effective when the target domain is distant from the pretraining distribution and when enough labelled data exists to avoid overfitting.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="7. Practical Considerations">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Practical Considerations
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Augmentations.</strong> Standard natural-image augmentations (crops, color jitter, blur) often transfer to new domains without modification. For medical images, intensity normalization variants and orientation changes are worth adding; aggressive color jitter or grayscale may not apply depending on the modality.</p>
+<p><strong>Dataset scale.</strong> SSL benefits from large and diverse data more than supervised pretraining. Diversity matters: a model pretrained on a narrow distribution learns a narrow representation regardless of dataset size.</p>
+<p><strong>Model scale.</strong> Larger encoders improve substantially with scale, in both pretraining task performance and downstream transfer. Among ViTs, ViT-L and ViT-g consistently outperform ViT-B when data and compute allow.</p>
+<p><strong>Compute.</strong> DINO and contrastive methods require many training epochs (800+ on ImageNet-scale data). MAE converges faster due to the more direct pixel reconstruction objective. In practice, starting from an already-pretrained model (DINOv2, MAE-pretrained ViT-L) rather than training from scratch is almost always the right choice.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="8. Why SSL Transfers">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Why SSL Transfers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>SSL does not learn a classifier. Given a new task with a small labelled dataset, fine-tuning does not need to reorganize the representation space from scratch; it only needs to find the right boundaries within a structure that already groups semantically similar inputs together.</p>
+<p>A linear probe succeeds on many tasks not because the model was trained to produce linearly separable features for those tasks, but because semantic consistency across augmented views is what the training objective required, and semantic consistency is exactly what a linear classifier exploits.</p>
+<p>This is why SSL-pretrained encoders support diverse tasks from a single frozen backbone and transfer across large domain gaps. The pretraining task and the downstream task are related not at the level of labels, but at the level of what structure a good representation must capture.</p>
+</div>
+</div>
+</div>
+<hr>
+<p><span id="appendix-infonce"></span></p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Appendix A: InfoNCE, Collapse, and Alignment vs. Uniformity">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Appendix A: InfoNCE, Collapse, and Alignment vs.&nbsp;Uniformity
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="InfoNCE">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>InfoNCE
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>InfoNCE treats representation learning as a multi-class classification problem. Given a batch of <span class="math inline">\(N\)</span> images, each with two augmented views, the loss over one positive pair <span class="math inline">\((z_i^{(1)}, z_i^{(2)})\)</span> is:</p>
+<p><span class="math display">\[
+\mathcal{L}_i = -\log \frac{\exp\!\left(z_i^{(1)} \cdot z_i^{(2)}\,/\,\tau\right)}{\displaystyle\sum_{j=1}^{N} \exp\!\left(z_i^{(1)} \cdot z_j^{(2)}\,/\,\tau\right)}
+\]</span></p>
+<p>The <span class="math inline">\(j=i\)</span> term in the denominator is the positive; all <span class="math inline">\(j \neq i\)</span> terms are negatives drawn from the same batch. The denominator normalizes over all <span class="math inline">\(N\)</span> candidates, so the model must score the true positive higher than every other image in the batch.</p>
+<p>The temperature <span class="math inline">\(\tau\)</span> controls sharpness. Low <span class="math inline">\(\tau\)</span> concentrates gradients on the hardest negatives; high <span class="math inline">\(\tau\)</span> distributes gradients more evenly. SimCLR uses <span class="math inline">\(\tau = 0.07\)</span>.</p>
+<p>Minimizing InfoNCE is equivalent to maximizing a lower bound on the mutual information <span class="math inline">\(I(z^{(1)}; z^{(2)})\)</span> between the two views.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Representation Collapse">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Representation Collapse
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Representation collapse occurs when the encoder maps all inputs to the same point in <span class="math inline">\(\mathbb{R}^d\)</span>. A collapsed encoder minimizes any positive-pair similarity loss trivially, but its features carry no information.</p>
+<p>Different methods prevent collapse in different ways.</p>
+<p><strong>Contrastive methods</strong> prevent collapse through negatives: a constant representation scores equally against all negatives, so it cannot minimize the InfoNCE denominator.</p>
+<p><strong>BYOL</strong> uses an asymmetric prediction head on the student side only. The asymmetry breaks the symmetry that would allow both networks to collapse simultaneously.</p>
+<p><strong>DINO</strong> uses centering (prevents single-mode collapse) and sharpening (prevents uniform collapse).</p>
+<p><strong>MAE</strong> prevents collapse by construction: pixel reconstruction has a non-trivial target that cannot be satisfied by a constant output.</p>
+</div>
+</div>
+</div>
+<hr>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Alignment and Uniformity">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Alignment and Uniformity
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>SSL objectives can be decomposed into two complementary pressures.</p>
+<p><strong>Alignment</strong> measures how close positive pairs are:</p>
+<p><span class="math display">\[
+\mathcal{L}_\text{align} = \mathbb{E}_{(x,\, x^+) \sim p_\text{pos}} \left\|f(x) - f(x^+)\right\|^2
+\]</span></p>
+<p><strong>Uniformity</strong> measures how evenly representations are spread across the unit hypersphere:</p>
+<p><span class="math display">\[
+\mathcal{L}_\text{uniform} = \log\; \mathbb{E}_{x,\,y \sim p_\text{data}} \left[\, e^{-2\|f(x) - f(y)\|^2} \,\right]
+\]</span></p>
+<p>A good representation minimizes both: positives are close (alignment), and the overall distribution does not collapse to a subspace (uniformity). InfoNCE optimizes both simultaneously: the numerator promotes alignment, and the denominator promotes uniformity by penalizing any representation that is close to many others. Self-distillation methods primarily optimize alignment; their collapse-prevention mechanisms serve as a proxy for uniformity.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

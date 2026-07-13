@@ -4,7 +4,8 @@
     "items": [
       "/blog/models/vision_transformers.html",
       "/blog/optimization/optimization_basics.html",
-      "/blog/stats/mutual_info.html"
+      "/blog/stats/mutual_info.html",
+      "/blog/learning/vit_pretraining.html"
     ]
   }
 ]

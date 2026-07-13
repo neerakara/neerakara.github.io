@@ -154,6 +154,34 @@ ul.task-list li input[type="checkbox"] {
       window['quarto-listing-loaded']();
     }
   })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-learning .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-learning'] = new List('listing-learning', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
   </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
@@ -299,7 +327,7 @@ Machine Learning Optimization Basics
 <h2 class="anchored" data-anchor-id="stats">Stats</h2>
 <div id="listing-stats" class="quarto-listing quarto-listing-container-grid">
 <div class="list grid quarto-listing-cols-1">
-<div class="g-col-1" data-index="0" data-categories="U3RhdGlzdGljcw==" data-listing-file-modified-sort="1778663438391" data-listing-reading-time-sort="7" data-listing-word-count-sort="1210">
+<div class="g-col-1" data-index="0" data-categories="U3RhdGlzdGljcw==" data-listing-file-modified-sort="1783716060052" data-listing-reading-time-sort="7" data-listing-word-count-sort="1210">
 <a href="../blog/stats/mutual_info.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <div class="card-body post-contents">
@@ -308,6 +336,27 @@ Mutual Information
 </h5>
 <div class="card-text listing-description delink">
 <p>Measuring statistical dependence between random variables</p>
+</div>
+</div>
+</div></a>
+</div>
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div>
+</section>
+<section id="learning" class="level2">
+<h2 class="anchored" data-anchor-id="learning">Learning</h2>
+<div id="listing-learning" class="quarto-listing quarto-listing-container-grid">
+<div class="list grid quarto-listing-cols-1">
+<div class="g-col-1" data-index="0" data-categories="TGVhcm5pbmc=" data-listing-file-modified-sort="1783978248536" data-listing-reading-time-sort="13" data-listing-word-count-sort="2458">
+<a href="../blog/learning/vit_pretraining.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Self-Supervised Representation Learning in Vision
+</h5>
+<div class="card-text listing-description delink">
+<p>Notes on contrastive learning, self-distillation, and masked prediction.</p>
 </div>
 </div>
 </div></a>
