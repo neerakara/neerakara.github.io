@@ -176,7 +176,7 @@ window.Quarto = {
 </header>
 
 
-<p>A visual encoder maps images to feature vectors; what those vectors <em>contain</em> is determined by training. Supervised training shapes representations to predict a fixed label set, which works well within the training distribution but limits what the representations capture. Self-supervised learning (SSL) sidesteps labels entirely, learning representations directly from the structure of images. This note covers the three main SSL principles: contrastive learning, self-distillation, and masked prediction.</p>
+<p>A visual encoder learns to represent whatever its training objective rewards. Supervised training optimizes for a fixed label set: the resulting representations encode what distinguishes those labels, which may not be what a different task requires. Self-supervised learning (SSL) sidesteps labels entirely, learning representations directly from the structure of images. This note covers the three main SSL principles: contrastive learning, self-distillation, and masked prediction.</p>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="1. Motivation">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -189,10 +189,8 @@ window.Quarto = {
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>The standard approach to pretraining visual encoders is supervised pretraining on a large labelled dataset (e.g., ImageNet-21k), followed by fine-tuning on a target task. This works well when the target task is visually similar to the pretraining labels. It has two structural limitations.</p>
-<p>First, labels are expensive. In domains like medical imaging, curating a large labelled dataset requires significant expert effort. Unlabelled data is far more accessible: medical archives, internet images, and domain-specific collections can easily reach millions of examples.</p>
-<p>Second, labels impose a particular partitioning of the visual world. A classifier trained on ImageNet learns representations that are useful for distinguishing among ImageNet categories. Those representations encode the features that vary across those categories, which may not be the features most useful for a different task. SSL does not optimize for any specific label set; it learns the general structure of the visual world.</p>
-<p>ViTs are particularly well suited to SSL. Unlike CNNs, they lack strong inductive biases (local connectivity, spatial equivariance), so they require large amounts of data to learn useful structure. That same flexibility means they can learn rich, general-purpose representations when trained on diverse unlabelled data. <a href="https://arxiv.org/abs/2304.07193">DINOv2</a> was trained on ~142M curated images with a 1.1B parameter model; <a href="https://arxiv.org/abs/2508.10104">DINOv3</a> scaled this to ~1.7B images with a 6.7B parameter model. Both demonstrate that a single SSL-pretrained encoder can support diverse downstream tasks without task-specific retraining.</p>
+<p>Supervised pretraining on large labelled datasets, followed by fine-tuning, works well when the target task resembles the pretraining labels. However, it has two structural limitations: (1) Labels are expensive. In domains like medical imaging, curating a large labelled dataset requires significant expert effort, while unlabelled data is far more accessible. (2), labels impose a particular partitioning of the visual world. A classifier trained on ImageNet learns representations shaped by ImageNet categories; those features may not be the most relevant for a different task. SSL optimizes no specific label set; it learns the general structure of the visual world.</p>
+<p>SSL became the dominant pretraining paradigm for three reasons: (1) unlabelled data are abundant; (2) ViTs, lacking the inductive biases of CNNs, scale particularly well on diverse unlabelled data; and (3) the results are compelling. <a href="https://arxiv.org/abs/2304.07193">DINOv2</a> and <a href="https://arxiv.org/abs/2508.10104">DINOv3</a>, trained on hundreds of millions of images, produce encoders that support diverse downstream tasks from a single frozen backbone.</p>
 </div>
 </div>
 </div>
@@ -209,13 +207,13 @@ window.Quarto = {
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Before asking <em>how</em> to learn without labels, it helps to ask <em>what</em> we want to learn. A representation is a function <span class="math inline">\(f_\theta\)</span> that maps an image <span class="math inline">\(x \in \mathbb{R}^{H \times W \times C}\)</span> to a feature vector <span class="math inline">\(z \in \mathbb{R}^d\)</span>:</p>
+<p>A representation is a function <span class="math inline">\(f_\theta\)</span> that maps an image <span class="math inline">\(x \in \mathbb{R}^{H \times W \times C}\)</span> to a feature vector <span class="math inline">\(z \in \mathbb{R}^d\)</span>:</p>
 <p><span class="math display">\[
 \underset{\rule{0pt}{1.5ex}\mathbb{R}^{H\times W\times C}}{x}
 \;\xrightarrow{\;f_\theta\;}\;
 \underset{\rule{0pt}{1.5ex}\mathbb{R}^d}{z}
 \]</span></p>
-<p>A useful framing from <a href="https://arxiv.org/abs/1206.5538">a seminal review of representation learning</a> is that images are generated by a small number of underlying <em>factors of variation</em>: identity, pose, disease state, lighting. A good representation <span class="math inline">\(z\)</span> should disentangle these factors from one another and from irrelevant surface statistics. This motivates four concrete properties.</p>
+<p>A good <span class="math inline">\(z\)</span> should capture the underlying <em>factors of variation</em> in an image (identity, pose, disease state, lighting) while discarding nuisance surface variation, as formalized in <a href="https://arxiv.org/abs/1206.5538">a seminal framework for representation learning</a>. This motivates four concrete properties.</p>
 <p><strong>Semantic.</strong> Images with similar content should map to nearby points in <span class="math inline">\(\mathbb{R}^d\)</span>. A chest X-ray with pneumonia should be closer to other pneumonia cases than to normal scans.</p>
 <p><strong>Invariant.</strong> The representation should be insensitive to changes that do not affect semantics: lighting, viewpoint, color, slight cropping. These are <em>nuisance factors</em>: they change pixels but not meaning.</p>
 <p><strong>Discriminative.</strong> Images with different semantic content should be far apart. Invariance alone is not enough; the trivial solution of mapping everything to zero is perfectly invariant but useless.</p>
@@ -243,7 +241,7 @@ window.Quarto = {
 x_1 = t_1(x), \qquad x_2 = t_2(x), \qquad t_1, t_2 \sim \mathcal{T}
 \]</span></p>
 <p>Each <span class="math inline">\(t_i\)</span> applies a random combination of operations such as random resized crop, horizontal flip, color jitter, grayscale, and Gaussian blur. We call <span class="math inline">\((x_1, x_2)\)</span> a <em>positive pair</em>: same semantic content, different appearance. The learning signal comes entirely from this structure: a good encoder should map <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> to nearby representations. Images from different sources are <em>negatives</em>; their representations should be far apart.</p>
-<p>The choice of augmentations matters. Augmentations that are too weak allow the encoder to distinguish views using low-level cues (brightness, texture) rather than learning semantic content. Augmentations that are too strong destroy the semantic signal and make the task impossible. In practice, random resized crops with large scale variation are the most important component: they force the encoder to recognize content at different spatial extents.</p>
+<p>The choice of augmentations defines what the encoder learns to be invariant to; random resized crops with large scale variation are the most critical choice, forcing the encoder to recognize content across different spatial extents rather than memorizing texture.</p>
 </div>
 </div>
 </div>
@@ -260,7 +258,7 @@ x_1 = t_1(x), \qquad x_2 = t_2(x), \qquad t_1, t_2 \sim \mathcal{T}
 </div>
 <div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>The self-supervised setup provides a training signal: views of the same image should produce similar representations. Methods differ in how they enforce this.</p>
+<p>Given two semantically equivalent views <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span>, how should we define the learning objective? There are three dominant answers.</p>
 <hr>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="A. Contrastive Learning">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
@@ -274,25 +272,22 @@ x_1 = t_1(x), \qquad x_2 = t_2(x), \qquad t_1, t_2 \sim \mathcal{T}
 </div>
 <div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p><strong>Idea.</strong> Pull the representations of positive pairs together; push the representations of negative pairs apart.</p>
-<p>Given views <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span>, we pass each through the encoder <span class="math inline">\(f_\theta\)</span> followed by a small projection head <span class="math inline">\(g_\phi\)</span>, then <span class="math inline">\(\ell_2\)</span>-normalize to get unit vectors <span class="math inline">\(z_1, z_2 \in \mathbb{R}^d\)</span>:</p>
+<p><strong>Idea.</strong> Compare against negatives: pull positive pairs together, push negatives apart.</p>
+<p>Each view passes through the encoder <span class="math inline">\(f_\theta\)</span> and a small projection head, producing a normalized embedding <span class="math inline">\(z_i\)</span>:</p>
 <p><span class="math display">\[
 \underset{\rule{0pt}{1.5ex}\mathbb{R}^{H\times W\times C}}{x_i}
 \;\xrightarrow{\;f_\theta\;}\;
 \underset{\rule{0pt}{1.5ex}\mathbb{R}^d}{h_i}
-\;\xrightarrow{\;g_\phi\;}\;
-\underset{\rule{0pt}{1.5ex}\mathbb{R}^d}{p_i}
-\;\xrightarrow{\;\ell_2\text{-norm}\;}\;
+\;\xrightarrow{\;\text{project + norm}\;}\;
 \underset{\rule{0pt}{1.5ex}\|\cdot\|=1}{z_i}
 \]</span></p>
-<p>The loss treats this as a classification problem: given <span class="math inline">\(z_1\)</span>, can the model identify <span class="math inline">\(z_2\)</span> as the positive among <span class="math inline">\(K-1\)</span> negatives? This is the InfoNCE objective (see <a href="#appendix-infonce">Appendix A</a>):</p>
+<p>The projection head is discarded after pretraining; <span class="math inline">\(h_i\)</span> is the representation used downstream. The loss treats matching as classification: identify <span class="math inline">\(z_2\)</span> as the positive among <span class="math inline">\(K-1\)</span> negatives (InfoNCE, detailed in <a href="#appendix-infonce">Appendix A</a>):</p>
 <p><span class="math display">\[
 \mathcal{L} = -\log \frac{\exp(z_1 \cdot z_2\, /\, \tau)}{\exp(z_1 \cdot z_2\, /\, \tau) \;+\; \sum_{k=1}^{K-1} \exp(z_1 \cdot z_k^-\, /\, \tau)}
 \]</span></p>
-<p>where <span class="math inline">\(\tau\)</span> is a temperature hyperparameter and <span class="math inline">\(z_k^-\)</span> are negative samples. The numerator rewards high similarity between the positive pair; the denominator penalizes high similarity to any negative.</p>
-<p><strong><a href="https://arxiv.org/abs/2002.05709">SimCLR</a></strong> is the canonical vision contrastive method. Within each training batch, all other images serve as negatives. A large batch size, typically 4096 or more, is needed to supply enough negatives for an informative loss.</p>
-<p><strong><a href="https://arxiv.org/abs/2103.00020">CLIP</a></strong> applies the same objective to image-text pairs. Given a batch of <span class="math inline">\(K\)</span> matched (image, text) pairs, two encoders, one for images and one for text, are trained to align matched pairs and separate unmatched ones. CLIP sidesteps augmentation design entirely: the image-text correspondence provides a natural source of positive pairs. The resulting representations support zero-shot classification and cross-modal retrieval.</p>
-<p>Contrastive methods work well but require many negatives. Maintaining large batches or external memory banks adds training complexity. Self-distillation methods, described next, achieve competitive results without explicit negatives.</p>
+<p>where <span class="math inline">\(\tau\)</span> is temperature and <span class="math inline">\(z_k^-\)</span> are negatives.</p>
+<p><strong><a href="https://arxiv.org/abs/2002.05709">SimCLR</a></strong> uses all other images in a large batch as negatives, requiring batch sizes of 4096 or more. <strong><a href="https://arxiv.org/abs/2103.00020">CLIP</a></strong> replaces augmented views with image-text pairs: the positive for each image is its caption, and all other captions are negatives. CLIP sidesteps augmentation design entirely and produces representations that support zero-shot classification and cross-modal retrieval.</p>
+<p>Contrastive methods are effective but require many negatives. Self-distillation, described next, achieves competitive results without them.</p>
 </div>
 </div>
 </div>
@@ -322,13 +317,9 @@ p_s = \mathrm{softmax}\!\left(\frac{f_\theta(x_1)}{\tau_s}\right),
 p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 \]</span></p>
 <p>The student is trained to match the teacher’s output by minimizing the cross-entropy <span class="math inline">\(H(p_t,\, p_s)\)</span>, with no gradient flowing through the teacher.</p>
-<p>Without countermeasures, this system collapses: both networks can converge to outputting the same constant distribution for all inputs, reducing the loss to zero without learning anything useful. DINO uses two complementary mechanisms to prevent this.</p>
-<p><strong>Centering</strong> subtracts a running mean <span class="math inline">\(c\)</span> from the teacher output before the softmax. This prevents any single prototype dimension from dominating and biases the teacher toward a spread distribution.</p>
-<p><strong>Sharpening</strong> uses a lower temperature <span class="math inline">\(\tau_t &lt; \tau_s\)</span> for the teacher. A sharper teacher concentrates its output on a small number of dimensions, making the training target informative rather than flat.</p>
-<p>Together, centering and sharpening create a productive tension: centering prevents the collapse where one dimension dominates, and sharpening prevents the collapse where the distribution becomes uniform over all dimensions.</p>
-<p><strong><a href="https://arxiv.org/abs/2006.07733">BYOL</a></strong> established that negatives are not needed: it uses an asymmetric architecture with a prediction head on the student side only, and the EMA teacher, to prevent collapse without centering or sharpening.</p>
-<p><strong><a href="https://arxiv.org/abs/2104.14294">DINO</a></strong> adapts this framework specifically to ViTs. The CLS token output is used as the representation, and multi-crop training is applied: the teacher sees a global crop of the image, while the student sees multiple smaller local crops. A key empirical finding is that DINO attention heads spontaneously learn to segment semantically coherent image regions, with no segmentation supervision. This emergent spatial structure is why DINO features transfer well to dense prediction tasks, and why DINO is the dominant pretraining strategy for ViT-based medical imaging.</p>
-<p><a href="https://arxiv.org/abs/2304.07193">DINOv2</a> extended this with a curated dataset, a masked prediction auxiliary loss, and scaling to 1.1B parameters.</p>
+<p>Without countermeasures, this system collapses: both networks converge to the same constant output for all inputs. DINO prevents this with centering (subtract a running mean <span class="math inline">\(c\)</span> from the teacher output to prevent single-dimension dominance) and sharpening (lower teacher temperature <span class="math inline">\(\tau_t &lt; \tau_s\)</span> to keep the training target peaked); see <a href="#appendix-infonce">Appendix A</a> for details.</p>
+<p><strong><a href="https://arxiv.org/abs/2006.07733">BYOL</a></strong> established that negatives are not needed: it uses an asymmetric prediction head on the student side only, alongside the EMA teacher, to prevent collapse.</p>
+<p><strong><a href="https://arxiv.org/abs/2104.14294">DINO</a></strong> applies this framework to ViTs, using the CLS token as representation and multi-crop training (teacher sees a global crop; student sees multiple smaller local crops). A striking finding: DINO attention heads spontaneously segment semantically coherent regions with no segmentation supervision, discussed further in Section 5.</p>
 </div>
 </div>
 </div>
@@ -347,7 +338,7 @@ p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 <div class="callout-body-container callout-body">
 <p><strong>Idea.</strong> Hide part of the input and train the model to predict what is missing.</p>
 <p><strong><a href="https://arxiv.org/abs/2111.06377">MAE</a></strong> (Masked Autoencoders) applies this to ViTs by masking a large fraction of patches (typically 75%) and reconstructing the original pixel values.</p>
-<p>The architecture has two parts. The encoder is a standard ViT that processes only the <em>visible</em> patches. Masking happens before the encoder, so its cost scales with the number of visible tokens <span class="math inline">\(N_\text{vis} = (1 - m) \cdot N\)</span> rather than the full sequence:</p>
+<p>The encoder processes only visible patches, so its cost scales with <span class="math inline">\(N_\text{vis} = (1-m) \cdot N\)</span> rather than the full sequence:</p>
 <p><span class="math display">\[
 \underset{\rule{0pt}{1.5ex}\mathbb{R}^{H\times W\times C}}{x}
 \;\xrightarrow{\;\text{patch + mask}\;}\;
@@ -355,13 +346,7 @@ p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 \;\xrightarrow{\;L\text{ blocks}\;}\;
 \underset{\rule{0pt}{1.5ex}N_\text{vis}\times d}{Z_\text{vis}}
 \]</span></p>
-<p>The decoder takes the encoder output concatenated with learnable mask tokens (one per hidden patch, each with its positional embedding) and reconstructs all <span class="math inline">\(N\)</span> patches:</p>
-<p><span class="math display">\[
-\left[\underset{\rule{0pt}{1.5ex}N_\text{vis}\times d}{Z_\text{vis}};\;\underset{\rule{0pt}{1.5ex}N_\text{mask}\times d}{\text{mask tokens}}\right]
-\;\xrightarrow{\;\text{decoder}\;}\;
-\underset{\rule{0pt}{1.5ex}N\times P^2 C}{\hat{x}}
-\]</span></p>
-<p>The loss is mean squared error between the reconstructed pixel values <span class="math inline">\(\hat{x}\)</span> and the true values, computed only over the masked patches.</p>
+<p>A lightweight decoder then takes the encoder output alongside learnable mask tokens and reconstructs the pixel values of all <span class="math inline">\(N\)</span> patches; the loss is MSE over the masked patches only.</p>
 <p>The 75% mask ratio is critical. Low masking ratios allow reconstruction by interpolating from nearby visible patches, which does not require understanding object structure. A 75% mask forces the encoder to reason about global context to fill in large missing regions.</p>
 <p>After pretraining, the decoder is discarded and the encoder is used as a feature extractor. MAE converges faster than DINO but produces somewhat weaker features for dense prediction tasks; DINOv2 combines both objectives to capture the benefits of each.</p>
 </div>
@@ -371,21 +356,23 @@ p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 </div>
 </div>
 <hr>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="5. Why Do These Produce Useful Representations?">
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="5. Why These Methods Work">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Why Do These Produce Useful Representations?
+<span class="screen-reader-only">Note</span>Why These Methods Work
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>The three methods enforce view consistency through different mechanisms, but the learned representations share two properties that go beyond what the training objective explicitly requires.</p>
-<p><strong>Object-centric structure.</strong> The clearest evidence is in DINO attention maps. At no point during training does the model see segmentation labels, yet at convergence its CLS token attention maps highlight foreground objects, and different attention heads attend to different semantic parts of the scene. This structure is not engineered; it emerges from the requirement to match views that contain the same object but differ in crop and appearance.</p>
-<p><strong>Geometry of the embedding space.</strong> Semantically related inputs cluster together, and the overall distribution of representations spreads uniformly across the hypersphere (see <a href="#appendix-infonce">Appendix A</a> for the alignment and uniformity decomposition).</p>
+<p><strong>Object-centric structure.</strong> At no point during training does the model see segmentation labels, yet at convergence DINO’s CLS token attention maps highlight foreground objects and different heads attend to different semantic parts of the scene. This structure emerges from the requirement to match views of the same scene that differ in crop and appearance.</p>
+<p><strong>Geometry of the embedding space.</strong> Semantically related inputs cluster together, and representations spread uniformly across the hypersphere (see <a href="#appendix-infonce">Appendix A</a> for the alignment and uniformity decomposition).</p>
+<p>Both properties have a direct consequence for transfer. SSL does not learn a classifier; it learns a representation space organized by semantic content. Fine-tuning on a labelled dataset finds boundaries within a structure that is already there. A linear probe works on many tasks because semantic consistency across views is what the training objective required, and semantic consistency is exactly what a linear classifier exploits.</p>
+<p>All three methods optimize surrogate objectives (matching views, matching a teacher, reconstructing missing content), yet consistently recover semantic, object-centric representations that transfer across diverse downstream tasks. This is not a coincidence: each objective is satisfiable only by encoders that capture what is semantically stable about an image, not what differs between views.</p>
 </div>
 </div>
 </div>
@@ -424,35 +411,15 @@ p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 <div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><strong>Augmentations.</strong> Standard natural-image augmentations (crops, color jitter, blur) often transfer to new domains without modification. For medical images, intensity normalization variants and orientation changes are worth adding; aggressive color jitter or grayscale may not apply depending on the modality.</p>
-<p><strong>Dataset scale.</strong> SSL benefits from large and diverse data more than supervised pretraining. Diversity matters: a model pretrained on a narrow distribution learns a narrow representation regardless of dataset size.</p>
-<p><strong>Model scale.</strong> Larger encoders improve substantially with scale, in both pretraining task performance and downstream transfer. Among ViTs, ViT-L and ViT-g consistently outperform ViT-B when data and compute allow.</p>
-<p><strong>Compute.</strong> DINO and contrastive methods require many training epochs (800+ on ImageNet-scale data). MAE converges faster due to the more direct pixel reconstruction objective. In practice, starting from an already-pretrained model (DINOv2, MAE-pretrained ViT-L) rather than training from scratch is almost always the right choice.</p>
-</div>
-</div>
-</div>
-<hr>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="8. Why SSL Transfers">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Why SSL Transfers
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>SSL does not learn a classifier. Given a new task with a small labelled dataset, fine-tuning does not need to reorganize the representation space from scratch; it only needs to find the right boundaries within a structure that already groups semantically similar inputs together.</p>
-<p>A linear probe succeeds on many tasks not because the model was trained to produce linearly separable features for those tasks, but because semantic consistency across augmented views is what the training objective required, and semantic consistency is exactly what a linear classifier exploits.</p>
-<p>This is why SSL-pretrained encoders support diverse tasks from a single frozen backbone and transfer across large domain gaps. The pretraining task and the downstream task are related not at the level of labels, but at the level of what structure a good representation must capture.</p>
+<p><strong>Scale.</strong> SSL improves with both data scale and model scale. Diversity matters more than raw dataset size: a narrow distribution produces narrow representations. Among ViTs, ViT-L and larger consistently outperform ViT-B in downstream transfer when data allows.</p>
+<p><strong>Starting from a pretrained checkpoint.</strong> Training SSL from scratch is expensive and rarely necessary. Strong publicly available checkpoints (DINOv2, MAE-pretrained ViT-L) provide an excellent starting point for most domains.</p>
 </div>
 </div>
 </div>
 <hr>
 <p><span id="appendix-infonce"></span></p>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Appendix A: InfoNCE, Collapse, and Alignment vs. Uniformity">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -461,11 +428,11 @@ p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <hr>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="InfoNCE">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -474,7 +441,7 @@ p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>InfoNCE treats representation learning as a multi-class classification problem. Given a batch of <span class="math inline">\(N\)</span> images, each with two augmented views, the loss over one positive pair <span class="math inline">\((z_i^{(1)}, z_i^{(2)})\)</span> is:</p>
 <p><span class="math display">\[
@@ -488,7 +455,7 @@ p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 </div>
 <hr>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Representation Collapse">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -497,20 +464,20 @@ p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Representation collapse occurs when the encoder maps all inputs to the same point in <span class="math inline">\(\mathbb{R}^d\)</span>. A collapsed encoder minimizes any positive-pair similarity loss trivially, but its features carry no information.</p>
 <p>Different methods prevent collapse in different ways.</p>
 <p><strong>Contrastive methods</strong> prevent collapse through negatives: a constant representation scores equally against all negatives, so it cannot minimize the InfoNCE denominator.</p>
 <p><strong>BYOL</strong> uses an asymmetric prediction head on the student side only. The asymmetry breaks the symmetry that would allow both networks to collapse simultaneously.</p>
-<p><strong>DINO</strong> uses centering (prevents single-mode collapse) and sharpening (prevents uniform collapse).</p>
+<p><strong>DINO</strong> uses two mechanisms: centering subtracts a running mean from the teacher output before softmax, preventing any single prototype dimension from dominating; sharpening applies a lower temperature to the teacher softmax, keeping the training target peaked rather than flat.</p>
 <p><strong>MAE</strong> prevents collapse by construction: pixel reconstruction has a non-trivial target that cannot be satisfied by a constant output.</p>
 </div>
 </div>
 </div>
 <hr>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Alignment and Uniformity">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -519,7 +486,7 @@ p_t = \mathrm{softmax}\!\left(\frac{f_\xi(x_2) - c}{\tau_t}\right)
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>SSL objectives can be decomposed into two complementary pressures.</p>
 <p><strong>Alignment</strong> measures how close positive pairs are:</p>
